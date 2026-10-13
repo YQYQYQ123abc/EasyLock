@@ -1,0 +1,4 @@
+// Independent distribution. Signing/export credentials are supplied by the developer.
+SWIFT_ACTIVE_COMPILATION_CONDITIONS = $(inherited) EASYLOCK_DIRECT
+
+// Free offline distribution: keep EASYLOCK_ENABLE_LICENSING undefined.

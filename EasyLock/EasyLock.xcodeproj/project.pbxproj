@@ -1,0 +1,605 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 110;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		B7000000000000000000006B /* EasyLockPreview/PreviewProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = B70000000000000000000066 /* EasyLockPreview/PreviewProvider.swift */; };
+		B7000000000000000000006C /* PreviewShared/LockedPreview.swift in Sources */ = {isa = PBXBuildFile; fileRef = B70000000000000000000001 /* PreviewShared/LockedPreview.swift */; };
+		B7000000000000000000006D /* EasyLockPreview.appex in Embed App Extensions */ = {isa = PBXBuildFile; fileRef = B70000000000000000000065 /* EasyLockPreview.appex */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		B700000000000000000000CF /* EasyLockThumbnail/ThumbnailProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = B700000000000000000000CA /* EasyLockThumbnail/ThumbnailProvider.swift */; };
+		B700000000000000000000D0 /* PreviewShared/LockedPreview.swift in Sources */ = {isa = PBXBuildFile; fileRef = B70000000000000000000001 /* PreviewShared/LockedPreview.swift */; };
+		B700000000000000000000D1 /* EasyLockThumbnail.appex in Embed App Extensions */ = {isa = PBXBuildFile; fileRef = B700000000000000000000C9 /* EasyLockThumbnail.appex */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+C80000000000000000000008 = {isa = PBXBuildFile; fileRef = C80000000000000000000003; };
+C80000000000000000000009 = {isa = PBXBuildFile; fileRef = C80000000000000000000002; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy,); }; };
+D90000000000000000000102 = {isa = PBXBuildFile; fileRef = D90000000000000000000101; };
+D90000000000000000000202 = {isa = PBXBuildFile; fileRef = D90000000000000000000201; };
+D90000000000000000000302 = {isa = PBXBuildFile; fileRef = D90000000000000000000301; };
+/* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		B7000000000000000000006E /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 7DEA6564307A286100FFA269 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = B70000000000000000000064;
+			remoteInfo = EasyLockPreview;
+		};
+		B700000000000000000000D2 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 7DEA6564307A286100FFA269 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = B700000000000000000000C8;
+			remoteInfo = EasyLockThumbnail;
+		};
+C8000000000000000000000A = {isa = PBXContainerItemProxy; containerPortal = 7DEA6564307A286100FFA269; proxyType = 1; remoteGlobalIDString = C80000000000000000000001; remoteInfo = EasyLockWidget; };
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		B70000000000000000000002 /* Embed App Extensions */ = {
+			isa = PBXCopyFilesBuildPhase;
+			dstPath = "";
+			dstSubfolder = PlugIns;
+			files = (
+C80000000000000000000009,
+				B7000000000000000000006D /* EasyLockPreview.appex in Embed App Extensions */,
+				B700000000000000000000D1 /* EasyLockThumbnail.appex in Embed App Extensions */,
+			);
+			name = "Embed App Extensions";
+		};
+/* End PBXCopyFilesBuildPhase section */
+
+/* Begin PBXFileReference section */
+		7DEA656C307A286100FFA269 /* EasyLock.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = EasyLock.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		B70000000000000000000001 /* PreviewShared/LockedPreview.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PreviewShared/LockedPreview.swift; sourceTree = "<group>"; };
+		B70000000000000000000065 /* EasyLockPreview.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = EasyLockPreview.appex; sourceTree = BUILT_PRODUCTS_DIR; };
+		B70000000000000000000066 /* EasyLockPreview/PreviewProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EasyLockPreview/PreviewProvider.swift; sourceTree = "<group>"; };
+		B700000000000000000000C9 /* EasyLockThumbnail.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = EasyLockThumbnail.appex; sourceTree = BUILT_PRODUCTS_DIR; };
+		B700000000000000000000CA /* EasyLockThumbnail/ThumbnailProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EasyLockThumbnail/ThumbnailProvider.swift; sourceTree = "<group>"; };
+C80000000000000000000002 = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = EasyLockWidget.appex; sourceTree = BUILT_PRODUCTS_DIR; };
+C80000000000000000000003 = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EasyLockWidget/EasyLockWidget.swift; sourceTree = "<group>"; };
+D90000000000000000000101 = {isa = PBXFileReference; lastKnownFileType = text.xml; path = EasyLockPreview/PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
+D90000000000000000000201 = {isa = PBXFileReference; lastKnownFileType = text.xml; path = EasyLockThumbnail/PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
+D90000000000000000000301 = {isa = PBXFileReference; lastKnownFileType = text.xml; path = EasyLockWidget/PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
+		A10000000000000000000001 /* Exceptions for "EasyLock" folder in "EasyLock" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Info.plist,
+			);
+			target = 7DEA656B307A286100FFA269 /* EasyLock */;
+		};
+/* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
+
+/* Begin PBXFileSystemSynchronizedRootGroup section */
+		7DEA656E307A286100FFA269 /* EasyLock */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				A10000000000000000000001 /* Exceptions for "EasyLock" folder in "EasyLock" target */,
+			);
+			path = EasyLock;
+			sourceTree = "<group>";
+		};
+/* End PBXFileSystemSynchronizedRootGroup section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		7DEA6569307A286100FFA269 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			files = (
+			);
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		7DEA6563307A286100FFA269 = {
+			isa = PBXGroup;
+			children = (
+D90000000000000000000101,
+D90000000000000000000201,
+D90000000000000000000301,
+				7DEA656E307A286100FFA269 /* EasyLock */,
+C80000000000000000000003,
+				B70000000000000000000001 /* PreviewShared/LockedPreview.swift */,
+				B700000000000000000000CA /* EasyLockThumbnail/ThumbnailProvider.swift */,
+				B70000000000000000000066 /* EasyLockPreview/PreviewProvider.swift */,
+				7DEA656D307A286100FFA269 /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		7DEA656D307A286100FFA269 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				7DEA656C307A286100FFA269 /* EasyLock.app */,
+C80000000000000000000002,
+				B700000000000000000000C9 /* EasyLockThumbnail.appex */,
+				B70000000000000000000065 /* EasyLockPreview.appex */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		7DEA656B307A286100FFA269 /* EasyLock */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 7DEA6577307A286200FFA269 /* Build configuration list for PBXNativeTarget "EasyLock" */;
+			buildPhases = (
+				7DEA6568307A286100FFA269 /* Sources */,
+				7DEA6569307A286100FFA269 /* Frameworks */,
+				7DEA656A307A286100FFA269 /* Resources */,
+				B70000000000000000000002 /* Embed App Extensions */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+C8000000000000000000000B,
+				B7000000000000000000006F /* PBXTargetDependency */,
+				B700000000000000000000D3 /* PBXTargetDependency */,
+			);
+			fileSystemSynchronizedGroups = (
+				7DEA656E307A286100FFA269 /* EasyLock */,
+			);
+			name = EasyLock;
+			productName = EasyLock;
+			productReference = 7DEA656C307A286100FFA269 /* EasyLock.app */;
+			productType = "com.apple.product-type.application";
+		};
+		B70000000000000000000064 /* EasyLockPreview */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = B70000000000000000000068 /* Build configuration list for PBXNativeTarget "EasyLockPreview" */;
+			buildPhases = (
+				B70000000000000000000067 /* Sources */,
+D90000000000000000000103,
+			);
+			buildRules = (
+			);
+			name = EasyLockPreview;
+			productName = EasyLockPreview;
+			productReference = B70000000000000000000065 /* EasyLockPreview.appex */;
+			productType = "com.apple.product-type.app-extension";
+		};
+		B700000000000000000000C8 /* EasyLockThumbnail */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = B700000000000000000000CC /* Build configuration list for PBXNativeTarget "EasyLockThumbnail" */;
+			buildPhases = (
+				B700000000000000000000CB /* Sources */,
+D90000000000000000000203,
+			);
+			buildRules = (
+			);
+			name = EasyLockThumbnail;
+			productName = EasyLockThumbnail;
+			productReference = B700000000000000000000C9 /* EasyLockThumbnail.appex */;
+			productType = "com.apple.product-type.app-extension";
+		};
+C80000000000000000000001 = {isa = PBXNativeTarget; buildConfigurationList = C80000000000000000000005; buildPhases = (C80000000000000000000004,D90000000000000000000303,); buildRules = (); dependencies = (); name = EasyLockWidget; productName = EasyLockWidget; productReference = C80000000000000000000002; productType = "com.apple.product-type.app-extension"; };
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		7DEA6564307A286100FFA269 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = 1;
+				LastSwiftUpdateCheck = 2700;
+				LastUpgradeCheck = 2700;
+				TargetAttributes = {
+					7DEA656B307A286100FFA269 = {
+						CreatedOnToolsVersion = 27.0;
+					};
+				};
+			};
+			buildConfigurationList = 7DEA6567307A286100FFA269 /* Build configuration list for PBXProject "EasyLock" */;
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+				Base,
+			);
+			mainGroup = 7DEA6563307A286100FFA269;
+			minimizedProjectReferenceProxies = 1;
+			preferredProjectObjectVersion = 77;
+			productRefGroup = 7DEA656D307A286100FFA269 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+C80000000000000000000001,
+				B700000000000000000000C8 /* EasyLockThumbnail */,
+				B70000000000000000000064 /* EasyLockPreview */,
+				7DEA656B307A286100FFA269 /* EasyLock */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		7DEA656A307A286100FFA269 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			files = (
+			);
+		};
+D90000000000000000000103 = {isa = PBXResourcesBuildPhase; files = (D90000000000000000000102,); };
+D90000000000000000000203 = {isa = PBXResourcesBuildPhase; files = (D90000000000000000000202,); };
+D90000000000000000000303 = {isa = PBXResourcesBuildPhase; files = (D90000000000000000000302,); };
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		7DEA6568307A286100FFA269 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			files = (
+			);
+		};
+		B70000000000000000000067 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			files = (
+				B7000000000000000000006B /* EasyLockPreview/PreviewProvider.swift in Sources */,
+				B7000000000000000000006C /* PreviewShared/LockedPreview.swift in Sources */,
+			);
+		};
+		B700000000000000000000CB /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			files = (
+				B700000000000000000000CF /* EasyLockThumbnail/ThumbnailProvider.swift in Sources */,
+				B700000000000000000000D0 /* PreviewShared/LockedPreview.swift in Sources */,
+			);
+		};
+C80000000000000000000004 = {isa = PBXSourcesBuildPhase; files = (C80000000000000000000008,); };
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		B7000000000000000000006F /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = B70000000000000000000064 /* EasyLockPreview */;
+			targetProxy = B7000000000000000000006E /* PBXContainerItemProxy */;
+		};
+		B700000000000000000000D3 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = B700000000000000000000C8 /* EasyLockThumbnail */;
+			targetProxy = B700000000000000000000D2 /* PBXContainerItemProxy */;
+		};
+C8000000000000000000000B = {isa = PBXTargetDependency; target = C80000000000000000000001; targetProxy = C8000000000000000000000A; };
+/* End PBXTargetDependency section */
+
+/* Begin XCBuildConfiguration section */
+		7DEA6575307A286200FFA269 /* Debug configuration for PBXProject "EasyLock" */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				DEVELOPMENT_TEAM = 6A3DJUV3HC;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
+				MACOSX_DEPLOYMENT_TARGET = 14.0;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = macosx;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "DEBUG $(inherited)";
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+			};
+			name = Debug;
+		};
+		7DEA6576307A286200FFA269 /* Release configuration for PBXProject "EasyLock" */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				DEVELOPMENT_TEAM = 6A3DJUV3HC;
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
+				MACOSX_DEPLOYMENT_TARGET = 14.0;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
+				SDKROOT = macosx;
+				SWIFT_COMPILATION_MODE = wholemodule;
+			};
+			name = Release;
+		};
+		7DEA6578307A286200FFA269 /* Debug configuration for PBXNativeTarget "EasyLock" */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = EasyLock/EasyLock.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				COMBINE_HIDPI_IMAGES = YES;
+				CURRENT_PROJECT_VERSION = 8;
+				DEVELOPMENT_TEAM = 6A3DJUV3HC;
+				ENABLE_APP_SANDBOX = YES;
+				ENABLE_HARDENED_RUNTIME = YES;
+				ENABLE_PREVIEWS = YES;
+				ENABLE_USER_SELECTED_FILES = readwrite;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = EasyLock/Info.plist;
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+				);
+				MARKETING_VERSION = 0.8;
+				PRODUCT_BUNDLE_IDENTIFIER = "com.Only-You.EasyLock";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				REGISTER_APP_GROUPS = NO;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_DEFAULT_ACTOR_ISOLATION = nonisolated;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+			};
+			name = Debug;
+		};
+		7DEA6579307A286200FFA269 /* Release configuration for PBXNativeTarget "EasyLock" */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = EasyLock/EasyLock.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				COMBINE_HIDPI_IMAGES = YES;
+				CURRENT_PROJECT_VERSION = 8;
+				DEVELOPMENT_TEAM = 6A3DJUV3HC;
+				ENABLE_APP_SANDBOX = YES;
+				ENABLE_HARDENED_RUNTIME = YES;
+				ENABLE_PREVIEWS = YES;
+				ENABLE_USER_SELECTED_FILES = readwrite;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = EasyLock/Info.plist;
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+				);
+				MARKETING_VERSION = 0.8;
+				PRODUCT_BUNDLE_IDENTIFIER = "com.Only-You.EasyLock";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				REGISTER_APP_GROUPS = NO;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_DEFAULT_ACTOR_ISOLATION = nonisolated;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+			};
+			name = Release;
+		};
+		B70000000000000000000069 /* Debug configuration for PBXNativeTarget "EasyLockPreview" */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				APPLICATION_EXTENSION_API_ONLY = YES;
+				CODE_SIGN_ENTITLEMENTS = EasyLockPreview/Extension.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 8;
+				DEVELOPMENT_TEAM = 6A3DJUV3HC;
+				ENABLE_APP_SANDBOX = YES;
+				ENABLE_HARDENED_RUNTIME = YES;
+				ENABLE_USER_SELECTED_FILES = readonly;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = EasyLockPreview/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+					"@executable_path/../../../../Frameworks",
+				);
+				MACOSX_DEPLOYMENT_TARGET = 14.0;
+				MARKETING_VERSION = 0.8;
+				PRODUCT_BUNDLE_IDENTIFIER = "com.Only-You.EasyLock.Preview";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+				SWIFT_VERSION = 5.0;
+			};
+			name = Debug;
+		};
+		B7000000000000000000006A /* Release configuration for PBXNativeTarget "EasyLockPreview" */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				APPLICATION_EXTENSION_API_ONLY = YES;
+				CODE_SIGN_ENTITLEMENTS = EasyLockPreview/Extension.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 8;
+				DEVELOPMENT_TEAM = 6A3DJUV3HC;
+				ENABLE_APP_SANDBOX = YES;
+				ENABLE_HARDENED_RUNTIME = YES;
+				ENABLE_USER_SELECTED_FILES = readonly;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = EasyLockPreview/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+					"@executable_path/../../../../Frameworks",
+				);
+				MACOSX_DEPLOYMENT_TARGET = 14.0;
+				MARKETING_VERSION = 0.8;
+				PRODUCT_BUNDLE_IDENTIFIER = "com.Only-You.EasyLock.Preview";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+				SWIFT_VERSION = 5.0;
+			};
+			name = Release;
+		};
+		B700000000000000000000CD /* Debug configuration for PBXNativeTarget "EasyLockThumbnail" */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				APPLICATION_EXTENSION_API_ONLY = YES;
+				CODE_SIGN_ENTITLEMENTS = EasyLockThumbnail/Extension.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 8;
+				DEVELOPMENT_TEAM = 6A3DJUV3HC;
+				ENABLE_APP_SANDBOX = YES;
+				ENABLE_HARDENED_RUNTIME = YES;
+				ENABLE_USER_SELECTED_FILES = readonly;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = EasyLockThumbnail/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+					"@executable_path/../../../../Frameworks",
+				);
+				MACOSX_DEPLOYMENT_TARGET = 14.0;
+				MARKETING_VERSION = 0.8;
+				PRODUCT_BUNDLE_IDENTIFIER = "com.Only-You.EasyLock.Thumbnail";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+				SWIFT_VERSION = 5.0;
+			};
+			name = Debug;
+		};
+		B700000000000000000000CE /* Release configuration for PBXNativeTarget "EasyLockThumbnail" */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				APPLICATION_EXTENSION_API_ONLY = YES;
+				CODE_SIGN_ENTITLEMENTS = EasyLockThumbnail/Extension.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 8;
+				DEVELOPMENT_TEAM = 6A3DJUV3HC;
+				ENABLE_APP_SANDBOX = YES;
+				ENABLE_HARDENED_RUNTIME = YES;
+				ENABLE_USER_SELECTED_FILES = readonly;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = EasyLockThumbnail/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+					"@executable_path/../../../../Frameworks",
+				);
+				MACOSX_DEPLOYMENT_TARGET = 14.0;
+				MARKETING_VERSION = 0.8;
+				PRODUCT_BUNDLE_IDENTIFIER = "com.Only-You.EasyLock.Thumbnail";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+				SWIFT_VERSION = 5.0;
+			};
+			name = Release;
+		};
+C80000000000000000000006 = {isa = XCBuildConfiguration; buildSettings = {REGISTER_APP_GROUPS = NO; APPLICATION_EXTENSION_API_ONLY = YES; CODE_SIGN_ENTITLEMENTS = EasyLockWidget/Extension.entitlements; CODE_SIGN_STYLE = Automatic; DEVELOPMENT_TEAM = 6A3DJUV3HC; ENABLE_APP_SANDBOX = YES; ENABLE_HARDENED_RUNTIME = YES; GENERATE_INFOPLIST_FILE = YES; INFOPLIST_FILE = EasyLockWidget/Info.plist; CURRENT_PROJECT_VERSION = 8; MARKETING_VERSION = 0.8; MACOSX_DEPLOYMENT_TARGET = 14.0; PRODUCT_BUNDLE_IDENTIFIER = "com.Only-You.EasyLock.Widget"; PRODUCT_NAME = "$(TARGET_NAME)"; SKIP_INSTALL = YES; SWIFT_VERSION = 5.0; LD_RUNPATH_SEARCH_PATHS = ("$(inherited)", "@executable_path/../Frameworks", "@executable_path/../../../../Frameworks",);}; name = Debug; };
+C80000000000000000000007 = {isa = XCBuildConfiguration; buildSettings = {REGISTER_APP_GROUPS = NO; APPLICATION_EXTENSION_API_ONLY = YES; CODE_SIGN_ENTITLEMENTS = EasyLockWidget/Extension.entitlements; CODE_SIGN_STYLE = Automatic; DEVELOPMENT_TEAM = 6A3DJUV3HC; ENABLE_APP_SANDBOX = YES; ENABLE_HARDENED_RUNTIME = YES; GENERATE_INFOPLIST_FILE = YES; INFOPLIST_FILE = EasyLockWidget/Info.plist; CURRENT_PROJECT_VERSION = 8; MARKETING_VERSION = 0.8; MACOSX_DEPLOYMENT_TARGET = 14.0; PRODUCT_BUNDLE_IDENTIFIER = "com.Only-You.EasyLock.Widget"; PRODUCT_NAME = "$(TARGET_NAME)"; SKIP_INSTALL = YES; SWIFT_VERSION = 5.0; LD_RUNPATH_SEARCH_PATHS = ("$(inherited)", "@executable_path/../Frameworks", "@executable_path/../../../../Frameworks",);}; name = Release; };
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		7DEA6567307A286100FFA269 /* Build configuration list for PBXProject "EasyLock" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				7DEA6575307A286200FFA269 /* Debug configuration for PBXProject "EasyLock" */,
+				7DEA6576307A286200FFA269 /* Release configuration for PBXProject "EasyLock" */,
+			);
+			defaultConfigurationName = Release;
+		};
+		7DEA6577307A286200FFA269 /* Build configuration list for PBXNativeTarget "EasyLock" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				7DEA6578307A286200FFA269 /* Debug configuration for PBXNativeTarget "EasyLock" */,
+				7DEA6579307A286200FFA269 /* Release configuration for PBXNativeTarget "EasyLock" */,
+			);
+			defaultConfigurationName = Release;
+		};
+		B70000000000000000000068 /* Build configuration list for PBXNativeTarget "EasyLockPreview" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				B70000000000000000000069 /* Debug configuration for PBXNativeTarget "EasyLockPreview" */,
+				B7000000000000000000006A /* Release configuration for PBXNativeTarget "EasyLockPreview" */,
+			);
+			defaultConfigurationName = Release;
+		};
+		B700000000000000000000CC /* Build configuration list for PBXNativeTarget "EasyLockThumbnail" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				B700000000000000000000CD /* Debug configuration for PBXNativeTarget "EasyLockThumbnail" */,
+				B700000000000000000000CE /* Release configuration for PBXNativeTarget "EasyLockThumbnail" */,
+			);
+			defaultConfigurationName = Release;
+		};
+C80000000000000000000005 = {isa = XCConfigurationList; buildConfigurations = (C80000000000000000000006, C80000000000000000000007,); defaultConfigurationName = Release; };
+/* End XCConfigurationList section */
+	};
+	rootObject = 7DEA6564307A286100FFA269 /* Project object */;
+	validationLevel = 1;
+}

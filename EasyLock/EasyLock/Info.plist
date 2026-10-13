@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>CFBundleDocumentTypes</key>
+	<array>
+		<dict>
+			<key>CFBundleTypeIconFile</key>
+			<string>LockedDocument</string>
+			<key>CFBundleTypeName</key>
+			<string>EasyLock 加密文件</string>
+			<key>CFBundleTypeRole</key>
+			<string>Editor</string>
+			<key>LSHandlerRank</key>
+			<string>Owner</string>
+			<key>LSItemContentTypes</key>
+			<array>
+				<string>com.only-you.easylock.archive</string>
+			</array>
+		</dict>
+	</array>
+	<key>CFBundleURLTypes</key>
+	<array>
+		<dict>
+			<key>CFBundleURLName</key>
+			<string>com.Only-You.EasyLock.shortcuts</string>
+			<key>CFBundleURLSchemes</key>
+			<array>
+				<string>easylock</string>
+			</array>
+		</dict>
+	</array>
+	<key>EasyLockWidgetGroup</key>
+	<string>$(DEVELOPMENT_TEAM).com.Only-You.EasyLock.shared</string>
+	<key>LSFileQuarantineEnabled</key>
+	<true/>
+	<key>NSServices</key>
+	<array>
+		<dict>
+			<key>NSMenuItem</key>
+			<dict>
+				<key>default</key>
+				<string>使用 EasyLock 加密或解密</string>
+			</dict>
+			<key>NSMessage</key>
+			<string>encryptWithEasyLock</string>
+			<key>NSPortName</key>
+			<string>EasyLock</string>
+			<key>NSRequiredContext</key>
+			<dict/>
+			<key>NSSendTypes</key>
+			<array>
+				<string>public.file-url</string>
+			</array>
+		</dict>
+	</array>
+	<key>UTExportedTypeDeclarations</key>
+	<array>
+		<dict>
+			<key>UTTypeConformsTo</key>
+			<array>
+				<string>public.data</string>
+			</array>
+			<key>UTTypeDescription</key>
+			<string>EasyLock 加密文件</string>
+			<key>UTTypeIconFile</key>
+			<string>LockedDocument.icns</string>
+			<key>UTTypeIdentifier</key>
+			<string>com.only-you.easylock.archive</string>
+			<key>UTTypeTagSpecification</key>
+			<dict>
+				<key>public.filename-extension</key>
+				<array>
+					<string>easylock</string>
+				</array>
+			</dict>
+		</dict>
+	</array>
+	<key>LSApplicationCategoryType</key>
+	<string>public.app-category.utilities</string>
+</dict>
+</plist>
