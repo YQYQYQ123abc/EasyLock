@@ -1,9 +1,22 @@
 import SwiftUI
+import AppKit
 
 enum EasyLockStyle {
-    static let accent = Color(red: 0.26, green: 0.36, blue: 0.72)
-    static let blue = Color(red: 0.34, green: 0.47, blue: 0.84)
-    static let secondary = Color(red: 0.76, green: 0.43, blue: 0.70)
+    private static func adaptive(_ light: UInt32, _ dark: UInt32) -> Color {
+        Color(nsColor: NSColor(name: nil) { appearance in
+            let value = appearance.bestMatch(from: [.darkAqua, .aqua]) == .darkAqua ? dark : light
+            return NSColor(srgbRed: CGFloat((value >> 16) & 255) / 255,
+                           green: CGFloat((value >> 8) & 255) / 255,
+                           blue: CGFloat(value & 255) / 255, alpha: 1)
+        })
+    }
+    static let accent = adaptive(0x4569CB, 0x9AB2FF)
+    static let blue = adaptive(0x5B7FE8, 0x7F9CF5)
+    static let secondary = adaptive(0xC777C6, 0xD899D7)
+    static let background = adaptive(0xF3F3F7, 0x111218)
+    static let sidebar = adaptive(0xECEDF3, 0x171821)
+    static let border = adaptive(0xE3E4EC, 0x383B4D)
+    static let buttonFill = Color(red: 0.29, green: 0.40, blue: 0.77)
 }
 struct BrandMark: View {
     var size: CGFloat = 64
@@ -28,7 +41,9 @@ struct VaultBackground: View {
     var body: some View {
         GeometryReader { proxy in
             ZStack(alignment: .bottomTrailing) {
-                (scheme == .dark ? Color(nsColor: .windowBackgroundColor) : Color.white)
+                EasyLockStyle.background
+                RadialGradient(colors: [EasyLockStyle.blue.opacity(0.13), .clear], center: .topLeading, startRadius: 0, endRadius: 500)
+                RadialGradient(colors: [EasyLockStyle.secondary.opacity(0.14), .clear], center: .bottomTrailing, startRadius: 0, endRadius: 460)
                 if !reduceTransparency {
                     BrandLoop().stroke(EasyLockStyle.blue.opacity(scheme == .dark ? 0.11 : 0.065), style: StrokeStyle(lineWidth: 16, lineCap: .round, lineJoin: .round))
                         .frame(width: min(proxy.size.width * 0.65, 520), height: 380).offset(x: 100, y: 110)
@@ -45,9 +60,7 @@ struct BrandPrimaryButtonStyle: ButtonStyle {
     func makeBody(configuration: Configuration) -> some View {
         configuration.label.font(.callout.weight(.semibold)).padding(.horizontal, 17).padding(.vertical, 10)
             .foregroundStyle(.white)
-            .background(EasyLockStyle.accent, in: RoundedRectangle(cornerRadius: 13))
-            .overlay(RoundedRectangle(cornerRadius: 13).stroke(Color.primary, lineWidth: 1.5))
-            .shadow(color: Color.primary.opacity(enabled ? 0.18 : 0), radius: 0, x: 0, y: configuration.isPressed ? 0 : 3)
+            .background(EasyLockStyle.buttonFill, in: RoundedRectangle(cornerRadius: 8))
             .offset(y: configuration.isPressed && !reduceMotion ? 2 : 0)
             .opacity(enabled ? 1 : 0.45)
             .animation(reduceMotion ? nil : .easeOut(duration: 0.12), value: configuration.isPressed)
@@ -59,8 +72,7 @@ struct BrandGroupBoxStyle: GroupBoxStyle {
             configuration.label.font(.headline)
             configuration.content
         }.frame(maxWidth: .infinity, alignment: .leading).padding(14)
-            .background(Color(nsColor: .controlBackgroundColor), in: RoundedRectangle(cornerRadius: 20))
-            .overlay(RoundedRectangle(cornerRadius: 20).stroke(Color.primary.opacity(0.7), lineWidth: 1.2))
-            .shadow(color: EasyLockStyle.secondary.opacity(0.09), radius: 0, x: 4, y: 4)
+            .background(Color(nsColor: .controlBackgroundColor), in: RoundedRectangle(cornerRadius: 12))
+            .overlay(RoundedRectangle(cornerRadius: 12).stroke(EasyLockStyle.border, lineWidth: 1))
     }
 }

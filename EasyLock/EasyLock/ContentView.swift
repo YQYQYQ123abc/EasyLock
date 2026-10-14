@@ -28,6 +28,7 @@ struct ContentView: View {
     @State private var requests = ExternalFileRequests.shared
     @State private var section: Section = .files
     @State private var search = ""
+    @State private var attentionOnly = false
     @State private var input = ""
     @State private var confirmation = ""
     @State private var decryptPassword = ""
@@ -50,24 +51,26 @@ struct ContentView: View {
     private let surface = Color(nsColor: .controlBackgroundColor)
 
     var body: some View {
-        NavigationSplitView {
-            VStack(alignment: .leading, spacing: 28) {
+        HStack(spacing: 0) {
+            if !store.password.isEmpty {
+            VStack(alignment: .leading, spacing: 18) {
                 HStack(spacing: 10) {
-                    BrandMark(size: 46)
+                    BrandMark(size: 32)
                     VStack(alignment: .leading, spacing: 3) {
-                        Text("EasyLock").font(.system(size: 20, weight: .semibold, design: .rounded))
+                        Text("EasyLock").font(.system(size: 16, weight: .semibold, design: .rounded))
                         Text("你的本地隐私空间").font(.caption2).foregroundStyle(.secondary)
                     }
-                }.padding(.horizontal, 18).padding(.top, 28)
+                }.padding(.horizontal, 18).padding(.top, 22)
                 List(Section.allCases, selection: $section) { item in
                     Label(item.rawValue, systemImage: item.icon).padding(.vertical, 6).tag(item)
                 }.listStyle(.sidebar)
                 VStack(alignment: .leading, spacing: 8) {
                     Label("免费离线 · 内容不上传", systemImage: "internaldrive").font(.caption)
-                    Text("开发预览版 0.8").font(.caption2).foregroundStyle(.tertiary)
+                    Text("开发预览版 \(Bundle.main.object(forInfoDictionaryKey: "CFBundleShortVersionString") as? String ?? "—")").font(.caption2).foregroundStyle(.tertiary)
                 }.foregroundStyle(.secondary).padding(20)
-            }.background(EasyLockStyle.blue.opacity(0.045)).navigationSplitViewColumnWidth(230)
-        } detail: {
+            }.frame(width: 196).background(EasyLockStyle.sidebar)
+                Divider()
+            }
             Group {
                 if store.password.isEmpty { welcome }
                 else {
@@ -79,7 +82,7 @@ struct ContentView: View {
                     #endif
                     }
                 }
-            }.frame(maxWidth: .infinity, maxHeight: .infinity).background { VaultBackground() }
+            }.frame(maxWidth: .infinity, maxHeight: .infinity).background(EasyLockStyle.background)
                 .overlay {
                     if dropTargeted && !store.busy {
                         RoundedRectangle(cornerRadius: 16).strokeBorder(accent, style: StrokeStyle(lineWidth: 2, dash: [8, 5]))
@@ -120,7 +123,7 @@ struct ContentView: View {
         }
         .tint(accent)
         .groupBoxStyle(BrandGroupBoxStyle())
-        .frame(minWidth: 960, minHeight: 700)
+        .frame(minWidth: 980, minHeight: 660)
         .toolbar {
             Button { showHelp = true } label: { Label("使用帮助", systemImage: "questionmark.circle") }
                 .disabled(store.busy)
@@ -230,112 +233,188 @@ struct ContentView: View {
     }
     private var externalRequestState: String { "\(requests.revision)-\(externalRequestsBlocked)-\(store.password.isEmpty)" }
 
+    private func authenticate() {
+        Task {
+            let isNew = !store.configured
+            if await store.authenticate(input, confirmation: confirmation) {
+                input = ""; confirmation = ""
+                if isNew && store.pendingURLs.isEmpty && !store.showUnlock && requests.count == 0 { showPasswordApp = true }
+            }
+        }
+    }
+
     private var welcome: some View {
-        VStack(alignment: .leading, spacing: 22) {
-            BrandMark(size: 100).rotationEffect(.degrees(-5))
-            VStack(alignment: .leading, spacing: 10) {
-                Text(store.configured ? "欢迎回来。" : "给你的私密文件，\n一把专属的锁。").font(.system(size: 30, weight: .semibold))
-                Text(store.configured ? "输入主密码，打开你的文件管理空间。" : "设置主密码，开始在这台 Mac 上加密文件。\n文件内容仅在本地处理。")
-                    .foregroundStyle(.secondary).lineSpacing(5)
-            }
-            VStack(spacing: 12) {
-                SecureField(store.configured ? "主密码" : "设置主密码（至少 10 个字符）", text: $input)
-                if !store.configured { SecureField("再次输入密码", text: $confirmation) }
-            }.textFieldStyle(.roundedBorder).controlSize(.large)
-            if !store.pendingURLs.isEmpty || store.showUnlock {
-                Label("已接收文件，解锁后继续处理。", systemImage: "tray.and.arrow.down").font(.caption).foregroundStyle(accent)
-            }
+        VStack(spacing: 14) {
+            BrandMark(size: 96).shadow(color: accent.opacity(0.18), radius: 18, y: 9)
+            Text(store.configured ? "欢迎回来" : "给文件一把专属的锁")
+                .font(.system(size: 24, weight: .semibold))
+            Text(store.configured ? "输入主密码，或使用 Touch ID" : "设置主密码，开始在本机保护文件")
+                .foregroundStyle(.secondary)
+            HStack(spacing: 8) {
+                SecureField(store.configured ? "主密码" : "至少 10 个字符的主密码", text: $input)
+                    .textFieldStyle(.plain).onSubmit { if !input.isEmpty && !store.busy { authenticate() } }
+                    .accessibilityLabel(store.configured ? "主密码" : "设置主密码")
+                Button(action: authenticate) {
+                    Image(systemName: "arrow.right").font(.headline).foregroundStyle(.white)
+                        .frame(width: 34, height: 34).background(EasyLockStyle.buttonFill, in: Circle())
+                }.buttonStyle(.plain).disabled(store.busy || input.isEmpty)
+                    .accessibilityLabel(store.configured ? "解锁 EasyLock" : "设置密码并开始")
+            }.padding(.leading, 16).padding(5).background(surface, in: Capsule())
+                .overlay(Capsule().stroke(EasyLockStyle.border)).frame(width: 330).padding(.top, 10)
             if !store.configured {
-                Label("请妥善保存密码。未启用恢复密钥的文件无法找回密码。", systemImage: "info.circle").font(.caption).foregroundStyle(.secondary)
+                SecureField("再次输入密码", text: $confirmation).textFieldStyle(.roundedBorder)
+                    .frame(width: 330).onSubmit { if !store.busy && !input.isEmpty { authenticate() } }
+                Text("请保存好密码；未启用恢复密钥的文件无法找回密码。")
+                    .font(.caption).foregroundStyle(.secondary)
             }
-            Button(store.configured ? "解锁 EasyLock" : "设置密码并开始") {
-                Task { let isNew = !store.configured; if await store.authenticate(input, confirmation: confirmation) { input = ""; confirmation = ""; if isNew && store.pendingURLs.isEmpty && !store.showUnlock && requests.count == 0 { showPasswordApp = true } } }
-            }.buttonStyle(BrandPrimaryButtonStyle()).controlSize(.large).disabled(store.busy || input.isEmpty).keyboardShortcut(.defaultAction)
-            if store.configured && store.touchIDEnabled {
-                Button { Task { await store.unlockWithTouchID() } } label: { Label("使用 Touch ID 解锁", systemImage: "touchid") }
-                    .controlSize(.large).disabled(store.busy || !store.touchIDAvailable).help(store.touchIDAvailable ? "使用系统指纹验证" : store.touchIDReason)
+            if !store.pendingURLs.isEmpty || store.showUnlock {
+                Label("已接收文件，解锁后继续处理", systemImage: "tray.and.arrow.down").font(.caption).foregroundStyle(accent)
             }
-            Button("不登录，使用密码或恢复密钥解密文件") { store.independentDecrypt() }
-                .buttonStyle(.plain).font(.caption).disabled(store.busy)
-            if store.configured && store.recoveryPublicKey != nil {
-                Button("使用恢复密钥重设主密码") { resettingPassword = true; showPasswordChange = true }
-                    .buttonStyle(.plain).font(.caption).disabled(store.busy)
-            }
-        }.frame(width: 410).padding(48)
+            HStack(spacing: 18) {
+                if store.configured && store.touchIDEnabled {
+                    Button { Task { await store.unlockWithTouchID() } } label: { Label("Touch ID", systemImage: "touchid") }
+                        .disabled(store.busy || !store.touchIDAvailable).help(store.touchIDReason)
+                }
+                if store.configured && store.recoveryPublicKey != nil {
+                    Button("使用恢复密钥") { resettingPassword = true; showPasswordChange = true }
+                }
+            }.buttonStyle(.plain).foregroundStyle(accent)
+            Button("不登录，直接解密文件") { store.independentDecrypt() }
+                .buttonStyle(.plain).font(.caption).foregroundStyle(.secondary).padding(.top, 8)
+                .disabled(store.busy)
+        }.padding(40).frame(maxWidth: .infinity, maxHeight: .infinity).background { VaultBackground() }
     }
 
     private var library: some View {
-        VStack(alignment: .leading, spacing: 20) {
-            HStack {
-                VStack(alignment: .leading, spacing: 7) {
-                    Text("私密文件").font(.system(size: 28, weight: .semibold)).tracking(-0.5)
-                    Text("把重要的内容，留给自己。").font(.callout).foregroundStyle(.secondary)
-                }
-                Spacer()
-                Menu {
-                    Button("添加文件…", systemImage: "doc.badge.plus") { store.chooseSources() }
-                    Button("添加文件夹…", systemImage: "folder.badge.plus") { store.chooseSources(foldersOnly: true) }
-                    Divider()
-                    Button("导入已有密文…", systemImage: "tray.and.arrow.down") { store.importFiles() }
-                    if !store.outcomes.isEmpty { Button("查看上次任务结果") { store.showResults = true } }
-                } label: { Label("添加项目", systemImage: "plus") }
-                    .menuStyle(.borderlessButton).fixedSize().padding(.horizontal, 16).padding(.vertical, 11)
-                    .foregroundStyle(.white).background(accent, in: RoundedRectangle(cornerRadius: 9))
-            }
-            HStack(spacing: 0) {
-                statistic("已登记项目", value: "\(store.items.count)", symbol: "lock.doc")
-                Rectangle().fill(Color.primary.opacity(0.08)).frame(width: 1, height: 34).padding(.horizontal, 24)
-                statistic("加密数据", value: ByteCountFormatter.string(fromByteCount: Int64(store.items.reduce(0) { $0 + $1.size }), countStyle: .file), symbol: "externaldrive")
-                Spacer()
-                Label("本地保护", systemImage: "checkmark.shield.fill").font(.caption.weight(.medium)).foregroundStyle(accent)
-            }.padding(.horizontal, 20).padding(.vertical, 16)
-                .background(surface, in: RoundedRectangle(cornerRadius: 12))
-                .overlay(RoundedRectangle(cornerRadius: 12).stroke(Color.primary.opacity(0.65), lineWidth: 1.2))
-            if !store.recoveries.isEmpty || !store.recoveryErrors.isEmpty {
-                HStack {
-                    Label("发现需要检查的未完成任务或离线目录", systemImage: "exclamationmark.arrow.triangle.2.circlepath").foregroundStyle(.orange)
-                    Spacer()
-                    Button("查看恢复") { section = .security }
-                }.font(.callout).padding(12).background(Color.orange.opacity(0.07), in: RoundedRectangle(cornerRadius: 9))
-            }
-            dropZone
-            if !store.items.isEmpty {
-                HStack(spacing: 12) {
-                    HStack(spacing: 8) {
-                        Image(systemName: "magnifyingglass").foregroundStyle(.tertiary)
+        HStack(spacing: 0) {
+            VStack(spacing: 0) {
+                HStack(spacing: 8) {
+                    HStack(spacing: 6) {
+                        Image(systemName: "magnifyingglass").foregroundStyle(.secondary)
                         TextField("搜索名称或路径", text: $search).textFieldStyle(.plain)
-                    }.padding(10).frame(maxWidth: 260).background(surface, in: RoundedRectangle(cornerRadius: 8))
-                    Spacer()
-                    Button("全选") { store.selection = Set(filteredItems.map(\.id)) }.buttonStyle(.plain).foregroundStyle(.secondary)
-                    Button { decryptPassword = ""; store.showUnlock = true } label: {
-                        Label(store.selection.isEmpty ? "解密所选" : "解密 \(store.selection.count) 项", systemImage: "lock.open")
-                    }.disabled(store.selection.isEmpty).controlSize(.large)
+                    }.padding(8).background(EasyLockStyle.sidebar, in: RoundedRectangle(cornerRadius: 8))
+                    Menu {
+                        Button("添加文件…") { store.chooseSources() }
+                        Button("添加文件夹…") { store.chooseSources(foldersOnly: true) }
+                        Button("导入已有密文…") { store.importFiles() }
+                        if !store.outcomes.isEmpty { Button("上次任务结果") { store.showResults = true } }
+                    } label: { Image(systemName: "plus").accessibilityLabel("添加文件或文件夹") }
+                    .menuStyle(.borderlessButton).fixedSize().padding(8)
+                }.padding(12)
+                if store.recoveryPublicKey == nil {
+                    HStack(alignment: .top, spacing: 8) {
+                        Text("建议先创建恢复密钥，保护之后新加密的文件。").font(.caption)
+                        Spacer(minLength: 0)
+                        Button("创建") { beginRecoverySetup() }.buttonStyle(.plain).font(.caption.bold())
+                    }.foregroundStyle(.orange).padding(10).background(Color.orange.opacity(0.09), in: RoundedRectangle(cornerRadius: 9)).padding(.horizontal, 12).padding(.bottom, 8)
                 }
-                fileTable
-            } else {
-                HStack(spacing: 24) {
-                    Label("原地加密", systemImage: "arrow.triangle.2.circlepath")
-                    Label("密码保护", systemImage: "key.horizontal")
-                    Label("校验后替换", systemImage: "checkmark.shield")
-                }.font(.caption).foregroundStyle(.secondary).frame(maxWidth: .infinity).padding(.bottom, 10)
-            }
-            HStack(spacing: 6) {
-                Image(systemName: "info.circle")
-                Text("支持大文件分块加密 · 修改后缀不能解密")
-                Spacer()
-                Button("使用说明") { section = .security }.buttonStyle(.plain).foregroundStyle(accent)
-            }.font(.caption).foregroundStyle(.secondary)
-        }.padding(28).disabled(store.busy)
+                if !store.recoveries.isEmpty || !store.recoveryErrors.isEmpty {
+                    Button { section = .security } label: {
+                        Label("有未完成任务，查看恢复", systemImage: "exclamationmark.arrow.triangle.2.circlepath")
+                            .font(.caption).foregroundStyle(.orange)
+                    }.buttonStyle(.plain).padding(10)
+                }
+                Picker("文件筛选", selection: $attentionOnly) {
+                    Text("全部 \(store.items.count)").tag(false)
+                    Text("需检查 \(store.items.filter { $0.warning != nil || $0.originalRetained }.count)").tag(true)
+                }.pickerStyle(.segmented).padding(.horizontal, 12).padding(.bottom, 8)
+                if filteredItems.isEmpty {
+                    VStack(spacing: 8) {
+                        Image(systemName: store.items.isEmpty ? "tray" : "magnifyingglass").font(.title).foregroundStyle(.tertiary)
+                        Text(store.items.isEmpty ? "尚未添加文件" : "没有匹配的记录").foregroundStyle(.secondary)
+                        if !search.isEmpty { Button("清除搜索") { search = "" }.buttonStyle(.plain).foregroundStyle(accent) }
+                    }.frame(maxWidth: .infinity, maxHeight: .infinity)
+                } else {
+                    List(filteredItems, selection: $store.selection) { item in
+                        HStack(spacing: 10) {
+                            fileBadge(item, size: 36)
+                            VStack(alignment: .leading, spacing: 3) {
+                                Text(item.name).font(.callout.weight(.medium)).lineLimit(1)
+                                Text(ByteCountFormatter.string(fromByteCount: Int64(item.size), countStyle: .file))
+                                    .font(.caption).foregroundStyle(.secondary)
+                            }
+                            Spacer(minLength: 0)
+                            Image(systemName: item.warning != nil || item.originalRetained ? "exclamationmark.circle.fill" : "lock.fill")
+                                .foregroundStyle(item.warning != nil || item.originalRetained ? Color.orange : accent).font(.caption)
+                                .accessibilityLabel(item.warning != nil || item.originalRetained ? "需要检查" : "密文记录")
+                        }.padding(.vertical, 5).tag(item.id)
+                    }.listStyle(.inset).scrollContentBackground(.hidden)
+                }
+                Divider()
+                HStack {
+                    Button("全选") { store.selection = Set(filteredItems.map(\.id)) }.disabled(filteredItems.isEmpty)
+                    if !store.selection.isEmpty { Button("清除选择") { store.selection = [] } }
+                    Spacer()
+                    Text("\(store.selection.count) 项已选").foregroundStyle(.secondary)
+                }.buttonStyle(.plain).font(.caption).padding(12)
+            }.frame(width: 310).background(surface)
+            Divider()
+            if store.items.isEmpty { dropZone.padding(28) }
+            else { fileDetails }
+        }.disabled(store.busy)
+        .onChange(of: search) { _, _ in retainVisibleSelection() }
+        .onChange(of: attentionOnly) { _, _ in retainVisibleSelection() }
     }
 
-    private func statistic(_ title: String, value: String, symbol: String) -> some View {
-        HStack(spacing: 12) {
-            Image(systemName: symbol).font(.system(size: 20, weight: .light)).foregroundStyle(.secondary)
-            VStack(alignment: .leading, spacing: 3) {
-                Text(value).font(.system(size: 20, weight: .medium, design: .rounded)).monospacedDigit().contentTransition(.numericText())
-                Text(title).font(.system(size: 10)).foregroundStyle(.secondary)
-            }
-        }
+    private func retainVisibleSelection() {
+        store.selection.formIntersection(Set(filteredItems.map(\.id)))
+    }
+    private var selectedItems: [LockedItem] { store.items.filter { store.selection.contains($0.id) } }
+    private func fileBadge(_ item: LockedItem, size: CGFloat) -> some View {
+        let ext = URL(fileURLWithPath: item.name).pathExtension.uppercased()
+        return Text(ext.isEmpty ? "FILE" : String(ext.prefix(5)))
+            .font(.system(size: size > 40 ? 14 : 10, weight: .bold, design: .rounded))
+            .foregroundStyle(.white).frame(width: size, height: size)
+            .background(ext.isEmpty ? EasyLockStyle.secondary : accent, in: RoundedRectangle(cornerRadius: size / 4))
+            .accessibilityHidden(true)
+    }
+    private var fileDetails: some View {
+        ScrollView {
+            VStack(alignment: .leading, spacing: 22) {
+                if let item = selectedItems.first, selectedItems.count == 1 {
+                    HStack(spacing: 16) {
+                        fileBadge(item, size: 64)
+                        VStack(alignment: .leading, spacing: 7) {
+                            Text(item.name).font(.title2.weight(.semibold)).textSelection(.enabled)
+                            Label(item.warning != nil || item.originalRetained ? "需要检查" : "密文记录", systemImage: item.warning != nil || item.originalRetained ? "exclamationmark.triangle" : "lock.fill")
+                                .font(.caption.weight(.semibold)).foregroundStyle(item.warning != nil || item.originalRetained ? Color.orange : accent)
+                                .padding(.horizontal, 10).padding(.vertical, 4).background(accent.opacity(0.08), in: Capsule())
+                        }
+                    }
+                    HStack {
+                        Button("解密…") { decryptPassword = ""; store.showUnlock = true }.buttonStyle(BrandPrimaryButtonStyle())
+                        Button("在 Finder 中显示") { NSWorkspace.shared.activateFileViewerSelecting([item.resolve()]) }
+                    }
+                    if let warning = item.warning { Text(warning).font(.callout).foregroundStyle(.orange) }
+                    if item.originalRetained { Label("可能仍有明文副本，请在 Finder 中检查。", systemImage: "exclamationmark.triangle").font(.caption).foregroundStyle(.orange) }
+                    VStack(spacing: 0) {
+                        detailRow("位置", value: item.path)
+                        detailRow("密文大小", value: ByteCountFormatter.string(fromByteCount: Int64(item.size), countStyle: .file))
+                        detailRow("登记时间", value: item.date.formatted(date: .abbreviated, time: .shortened))
+                        detailRow("恢复凭据", value: "加密时的密码，或当时启用的恢复密钥")
+                    }
+                    Text("此处展示本机登记信息，不代表已重新校验文件。解密时会验证密文完整性。").font(.caption).foregroundStyle(.secondary)
+                } else if !selectedItems.isEmpty {
+                    Label("已选择 \(selectedItems.count) 个项目", systemImage: "doc.on.doc").font(.title2.weight(.semibold))
+                    Text("批量解密将使用同一凭据；使用不同密码的文件请分批处理。").foregroundStyle(.secondary)
+                    Button("解密所选…") { decryptPassword = ""; store.showUnlock = true }.buttonStyle(BrandPrimaryButtonStyle())
+                    ForEach(selectedItems) { Text($0.name).lineLimit(2) }
+                } else {
+                    Image(systemName: "lock.doc").font(.system(size: 48, weight: .light)).foregroundStyle(accent)
+                    Text("选择文件，查看详情").font(.title2.weight(.semibold))
+                    Text("按住 ⌘ 可选择多个项目。也可以将文件或文件夹拖到窗口中添加。").foregroundStyle(.secondary)
+                }
+                Divider()
+                Label("修改后缀不会解密；无法双击打开时，请拖回 EasyLock。", systemImage: "info.circle")
+                    .font(.caption).foregroundStyle(.secondary)
+            }.frame(maxWidth: .infinity, alignment: .leading).padding(30)
+        }.frame(maxWidth: .infinity, maxHeight: .infinity).background(surface)
+    }
+    private func detailRow(_ title: String, value: String) -> some View {
+        HStack(alignment: .top, spacing: 14) {
+            Text(title).foregroundStyle(.secondary).frame(width: 72, alignment: .leading)
+            Text(value).textSelection(.enabled).frame(maxWidth: .infinity, alignment: .leading)
+        }.font(.callout).padding(.vertical, 11).overlay(alignment: .bottom) { Divider() }
     }
 
     private var dropZone: some View {
@@ -366,91 +445,115 @@ struct ContentView: View {
             }
         }.padding(store.items.isEmpty ? 30 : 16).frame(maxWidth: .infinity, maxHeight: store.items.isEmpty ? .infinity : nil)
             .background(dropTargeted ? EasyLockStyle.secondary.opacity(0.13) : surface, in: RoundedRectangle(cornerRadius: 24))
-            .overlay(RoundedRectangle(cornerRadius: 24).strokeBorder(dropTargeted ? accent : Color.primary.opacity(0.8), style: StrokeStyle(lineWidth: 1.5, dash: dropTargeted ? [7, 5] : [])))
-            .shadow(color: EasyLockStyle.blue.opacity(0.1), radius: 0, x: 5, y: 5)
+            .overlay(RoundedRectangle(cornerRadius: 24).strokeBorder(dropTargeted ? accent : EasyLockStyle.border, style: StrokeStyle(lineWidth: 1, dash: dropTargeted ? [7, 5] : [])))
+
             .animation(reduceMotion ? nil : .easeInOut(duration: 0.16), value: dropTargeted)
     }
 
-    private var fileTable: some View {
-        Table(filteredItems, selection: $store.selection) {
-            TableColumn("文件名称") { item in
-                HStack(spacing: 12) {
-                    Image(systemName: "lock.doc").font(.system(size: 21, weight: .light)).foregroundStyle(accent)
-                        .frame(width: 36, height: 40).background(accent.opacity(0.06), in: RoundedRectangle(cornerRadius: 7))
-                    VStack(alignment: .leading, spacing: 5) {
-                        Text(item.name).font(.system(size: 13, weight: .medium)).lineLimit(1)
-                        Text(item.path).font(.system(size: 10)).foregroundStyle(.tertiary).lineLimit(1).truncationMode(.middle)
-                    }.padding(.vertical, 7)
-                }.help(item.path)
-            }.width(min: 210, ideal: 320)
-            TableColumn("大小") { Text(ByteCountFormatter.string(fromByteCount: Int64($0.size), countStyle: .file)).font(.caption).foregroundStyle(.secondary) }.width(75)
-            TableColumn("状态") { item in
-                HStack(spacing: 5) {
-                    Circle().fill(item.warning == nil ? accent : Color.orange).frame(width: 5, height: 5)
-                    Text(item.warning != nil ? "需要处理" : (item.originalRetained ? "旧版副本" : (item.inPlace == true ? "已加密" : "已导入")))
-                }.font(.system(size: 10)).foregroundStyle(.secondary).help(item.warning ?? "")
-            }.width(80)
-            TableColumn("") { item in
-                Button { NSWorkspace.shared.activateFileViewerSelecting([item.resolve()]) } label: { Image(systemName: "arrow.up.forward.square").foregroundStyle(.secondary) }
-                    .buttonStyle(.borderless).help("在 Finder 中显示")
-            }.width(24)
-        }.frame(minHeight: 145).clipShape(RoundedRectangle(cornerRadius: 10))
+    private var filteredItems: [LockedItem] {
+        store.items.filter {
+            (!attentionOnly || $0.warning != nil || $0.originalRetained) &&
+            (search.isEmpty || $0.name.localizedCaseInsensitiveContains(search) || $0.path.localizedCaseInsensitiveContains(search))
+        }
     }
-    private var filteredItems: [LockedItem] { store.items.filter { search.isEmpty || $0.name.localizedCaseInsensitiveContains(search) || $0.path.localizedCaseInsensitiveContains(search) } }
 
+    private func beginRecoverySetup() {
+        recoveryDraft = RecoveryKey.generate(); recoveryConfirmation = ""; recoveryExported = false; showRecoverySetup = true
+    }
+    private var securityChecks: [(String, Bool)] {
+        [("主密码已设置", store.configured), ("闲置自动锁定", store.autoLockMinutes > 0),
+         ("已配置恢复密钥（用于新文件）", store.recoveryPublicKey != nil)]
+    }
     private var settings: some View {
-        ScrollView { VStack(alignment: .leading, spacing: 25) {
-            Text("安全与设置").font(.largeTitle.weight(.semibold))
-            Text("清晰掌握每一次保护与恢复。 ").foregroundStyle(.secondary)
-            GroupBox {
-                VStack(alignment: .leading, spacing: 10) {
-                    Label("免费 · 离线使用", systemImage: "internaldrive").font(.headline)
-                    Text("无需账号或激活，不限制使用设备数量。加密与解密在本机完成，应用不上传文件或使用记录。").foregroundStyle(.secondary)
-                    Text("发行渠道：\(DistributionChannel.name)。\(DistributionChannel.updateDescription)").font(.caption).foregroundStyle(.secondary)
-                    Text("苹果“密码”的同步和云盘文件同步由系统及对应服务管理，请按需调整它们的设置。").font(.caption).foregroundStyle(.secondary)
-                }.frame(maxWidth: .infinity, alignment: .leading).padding(10)
-            }
-            GroupBox {
-                VStack(alignment: .leading, spacing: 18) {
-                    Label("主密码已设置", systemImage: "key.fill").font(.headline)
-                    Text("主密码用于登录及新文件加密。更改后，已有文件仍使用原加密密码或对应恢复密钥。").foregroundStyle(.secondary)
-                    Button("保存主密码到苹果“密码”…") { showPasswordApp = true }
-                    Button("更改主密码…") { resettingPassword = false; showPasswordChange = true }
-                    Divider()
-                    Picker("闲置后锁定", selection: Binding(get: { store.autoLockMinutes }, set: { store.setAutoLockMinutes($0) })) {
-                        Text("1 分钟").tag(1); Text("5 分钟").tag(5); Text("15 分钟").tag(15); Text("不按闲置时间锁定").tag(0)
+        ScrollView {
+            VStack(alignment: .leading, spacing: 20) {
+                Text("安全与设置").font(.system(size: 24, weight: .semibold))
+                GroupBox {
+                    VStack(alignment: .leading, spacing: 12) {
+                        Text("保护设置 \(securityChecks.filter { $0.1 }.count) / \(securityChecks.count)").font(.headline)
+                        HStack(spacing: 5) {
+                            ForEach(securityChecks.indices, id: \.self) { index in
+                                Capsule().fill(securityChecks[index].1 ? accent : EasyLockStyle.border).frame(height: 5)
+                            }
+                        }.accessibilityHidden(true)
+                        ForEach(securityChecks.indices, id: \.self) { index in
+                            HStack {
+                                Text(securityChecks[index].0)
+                                Spacer()
+                                Image(systemName: securityChecks[index].1 ? "checkmark.circle.fill" : "circle")
+                                    .foregroundStyle(securityChecks[index].1 ? accent : .secondary)
+                                    .accessibilityLabel(securityChecks[index].1 ? "已设置" : "未设置")
+                            }
+                        }
+                        Text("此处仅显示设置状态，不是文件安全评分。Touch ID 为可选快捷解锁方式。").font(.caption).foregroundStyle(.secondary)
                     }
-                    Text("锁屏、屏幕关闭、睡眠或切换系统会话时也会锁定应用。自动锁定会请求安全停止当前任务，不会自动加密磁盘上已解密的文件。").font(.caption).foregroundStyle(.secondary)
-                    Divider()
-                    Label(store.recoveryPublicKey == nil ? "尚未启用恢复密钥" : "新文件已启用恢复密钥", systemImage: "key.horizontal").font(.headline)
-                    if let key = store.recoveryPublicKey { Text("密钥标识：\(RecoveryKey.identifier(key))").font(.caption.monospaced()) }
-                    Text("只对启用后新加密的文件生效。应用只保存公开部分，无法重新显示密钥；更换后请保留旧密钥用于旧文件。").font(.caption).foregroundStyle(.secondary)
-                    Button(store.recoveryPublicKey == nil ? "创建恢复密钥…" : "更换恢复密钥…") {
-                        recoveryDraft = RecoveryKey.generate(); recoveryConfirmation = ""; recoveryExported = false; showRecoverySetup = true
+                }
+                Text("登录与解锁").font(.caption.weight(.semibold)).foregroundStyle(.secondary)
+                GroupBox {
+                    VStack(spacing: 0) {
+                        settingRow("主密码", detail: "更改后，旧文件仍需原密码或对应恢复密钥。") {
+                            Button("更改…") { resettingPassword = false; showPasswordChange = true }
+                            Button("存入“密码”App…") { showPasswordApp = true }
+                        }
+                        Divider()
+                        settingRow("闲置后锁定", detail: "锁屏、睡眠和切换用户时也会锁定；不会自动加密已解密文件。") {
+                            Picker("闲置后锁定", selection: Binding(get: { store.autoLockMinutes }, set: { store.setAutoLockMinutes($0) })) {
+                                Text("1 分钟").tag(1); Text("5 分钟").tag(5); Text("15 分钟").tag(15); Text("不按闲置锁定").tag(0)
+                            }.labelsHidden().frame(width: 140)
+                        }
+                        Divider()
+                        settingRow("Touch ID", detail: store.touchIDAvailable ? "更改指纹后需重新启用；凭据保存在本机钥匙串。" : store.touchIDReason) {
+                            Toggle("Touch ID", isOn: Binding(get: { store.touchIDEnabled }, set: { value in Task { await store.setTouchID(value) } }))
+                                .toggleStyle(.switch).labelsHidden().disabled(!store.touchIDAvailable && !store.touchIDEnabled)
+                        }
                     }
-                    Divider()
-                    Toggle("在桌面小组件显示记录数量", isOn: $widgetShowCount)
-                        .onChange(of: widgetShowCount) { _, _ in WidgetSummary.publish(count: store.items.count) }
-                    Text("默认隐藏数量，小组件不保存文件名、路径或密码。系统刷新可能延迟；显示的是最近同步的记录数量。").font(.caption).foregroundStyle(.secondary)
-                    Divider()
-                    Toggle("登录时启动 EasyLock", isOn: Binding(get: { store.loginEnabled }, set: { store.setLogin($0) }))
-                    Divider()
-                    Toggle(isOn: Binding(get: { store.touchIDEnabled }, set: { enabled in Task { await store.setTouchID(enabled) } })) {
-                        Label("Touch ID 解锁", systemImage: "touchid")
-                    }.disabled(!store.touchIDAvailable && !store.touchIDEnabled)
-                    Text(store.touchIDAvailable ? "启用后，主密码保存在受当前指纹保护的本机钥匙串中。变更指纹后需重新启用，密码解锁始终保留。" : store.touchIDReason)
-                        .font(.caption).foregroundStyle(.secondary)
-                }.padding(14)
-            }
-            GroupBox {
-                VStack(alignment: .leading, spacing: 10) {
-                    Label("开发预览版的文件策略", systemImage: "doc.text.magnifyingglass").font(.headline)
-                    Text("保存文件内容、目录结构、名称、权限、时间、标签、资源分支及访问控制列表。macOS 管理的访问授权、来源及下载隔离状态交由系统维护，不直接重写旧标记。实际恢复校验通过后才替换原件；不支持的文件会中止处理。").foregroundStyle(.secondary).lineSpacing(5)
-                    Text("请先关闭正在编辑文件的程序。新文件的系统编号和状态变更时间无法保持；历史缓存、备份和其他明文副本不会自动清除。").font(.caption).foregroundStyle(.secondary)
-                }.padding(14)
-            }
-            recoveryPanel
-        }.padding(36).frame(maxWidth: 760, alignment: .leading) }.disabled(store.busy)
+                }
+                Text("恢复密钥").font(.caption.weight(.semibold)).foregroundStyle(.secondary)
+                GroupBox {
+                    settingRow(store.recoveryPublicKey == nil ? "尚未创建恢复密钥" : "已为新文件启用", detail: "仅适用于启用后新加密的文件。请自行保存完整密钥；更换后保留旧密钥。") {
+                        Button(store.recoveryPublicKey == nil ? "创建…" : "更换…", action: beginRecoverySetup)
+                    }
+                    if let key = store.recoveryPublicKey { Text("密钥标识：\(RecoveryKey.identifier(key))").font(.caption.monospaced()).foregroundStyle(.secondary) }
+                }
+                Text("通用").font(.caption.weight(.semibold)).foregroundStyle(.secondary)
+                GroupBox {
+                    VStack(spacing: 0) {
+                        settingRow("登录时启动 EasyLock") {
+                            Toggle("登录时启动 EasyLock", isOn: Binding(get: { store.loginEnabled }, set: { store.setLogin($0) })).toggleStyle(.switch).labelsHidden()
+                        }
+                        Divider()
+                        settingRow("小组件显示记录数量", detail: "默认隐藏，不共享文件名、路径或密码；系统刷新可能延迟。") {
+                            Toggle("小组件显示记录数量", isOn: $widgetShowCount).toggleStyle(.switch).labelsHidden()
+                                .onChange(of: widgetShowCount) { _, _ in WidgetSummary.publish(count: store.items.count) }
+                        }
+                    }
+                }
+                recoveryPanel
+                Text("关于").font(.caption.weight(.semibold)).foregroundStyle(.secondary)
+                GroupBox {
+                    VStack(alignment: .leading, spacing: 10) {
+                        Label("免费 · 离线使用", systemImage: "internaldrive").font(.headline)
+                        Text("无需账号或激活，不限制设备数量。加密与解密在本机完成，应用不上传文件或使用记录。")
+                        Text("\(DistributionChannel.name) · \(DistributionChannel.updateDescription)")
+                        Text("云盘与苹果“密码”的同步由相应服务和系统设置管理。")
+                        Button("使用帮助与隐私说明") { showHelp = true }
+                        DisclosureGroup("文件保护范围") {
+                            Text("实际恢复并校验后才替换原件。支持的文件内容与元数据会恢复，macOS 管理的标记由系统维护。加密不会清除历史缓存、备份及其他明文副本；操作前请关闭编辑这些文件的程序。")
+                                .padding(.top, 8)
+                        }
+                    }.font(.callout).foregroundStyle(.secondary)
+                }
+            }.frame(maxWidth: 680).padding(32).frame(maxWidth: .infinity)
+        }.disabled(store.busy)
+    }
+    private func settingRow<Actions: View>(_ title: String, detail: String? = nil, @ViewBuilder actions: () -> Actions) -> some View {
+        HStack(spacing: 18) {
+            VStack(alignment: .leading, spacing: 4) {
+                Text(title).font(.callout)
+                if let detail { Text(detail).font(.caption).foregroundStyle(.secondary).fixedSize(horizontal: false, vertical: true) }
+            }.frame(maxWidth: .infinity, alignment: .leading)
+            HStack(spacing: 8, content: actions)
+        }.padding(.vertical, 12)
     }
 
     private var recoveryPanel: some View {
