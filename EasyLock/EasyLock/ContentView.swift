@@ -32,6 +32,7 @@ struct ContentView: View {
     @State private var input = ""
     @State private var confirmation = ""
     @State private var decryptPassword = ""
+    @State private var didRequestDecryptionTouchID = false
     @State private var dropTargeted = false
     @State private var showPasswordChange = false
     @State private var resettingPassword = false
@@ -93,7 +94,10 @@ struct ContentView: View {
         }
         .animation(reduceMotion ? nil : .easeInOut(duration: 0.22), value: section)
         .animation(reduceMotion ? nil : .easeInOut(duration: 0.18), value: dropTargeted)
-        .onAppear { store.refreshTouchIDAvailability() }
+        .onAppear {
+            store.refreshTouchIDAvailability()
+            if let message = store.preview.message { store.notice = message }
+        }
         .task(id: externalRequestState) {
             guard !externalRequestsBlocked else { return }
             if let shortcut = requests.shortcut, !store.password.isEmpty || !shortcut.hasPrefix("add-") {
@@ -178,12 +182,17 @@ struct ContentView: View {
         .task(id: panelState) {
             if !store.nativePanelActive { store.panels.reconcile(requestedPanels) }
         }
-        .onDisappear { store.panels.didDismiss() }
+        .onDisappear { store.preview.close(); store.panels.didDismiss() }
+        .onReceive(NotificationCenter.default.publisher(for: NSApplication.willTerminateNotification)) { _ in store.preview.close() }
+        .onChange(of: store.preview.message) { _, message in
+            if !store.preview.requested, let message { store.notice = message }
+        }
     }
 
     private var requestedPanels: [PanelCoordinator.Panel] {
         var result: [PanelCoordinator.Panel] = []
         if store.notice != nil { result.append(.notice) }
+        if store.preview.requested { result.append(.preview) }
         if showHelp { result.append(.help) }
         if showPasswordChange { result.append(.passwordChange) }
         if showRecoverySetup { result.append(.recoverySetup) }
@@ -204,6 +213,7 @@ struct ContentView: View {
                 ScrollView { Text(store.notice ?? "").textSelection(.enabled).frame(maxWidth: .infinity, alignment: .leading) }.frame(maxHeight: 240)
                 HStack { Spacer(); Button("知道了") { store.notice = nil }.keyboardShortcut(.defaultAction) }
             }.padding(28).frame(width: 460)
+        case .preview: PrivatePreviewView(preview: store.preview, touchIDEnabled: store.touchIDEnabled && store.touchIDAvailable)
         case .encrypt: encryptionSheet
         case .decrypt: decryptionSheet
         case .results: resultsSheet
@@ -216,6 +226,7 @@ struct ContentView: View {
     private func clearRequest(_ panel: PanelCoordinator.Panel) {
         switch panel {
         case .notice: store.notice = nil
+        case .preview: store.preview.close()
         case .encrypt: store.pendingURLs = []
         case .decrypt: store.showUnlock = false; decryptPassword = ""; recoveryInput = ""
         case .results: store.showResults = false
@@ -228,7 +239,7 @@ struct ContentView: View {
     }
 
     private var externalRequestsBlocked: Bool {
-        store.panels.occupied || store.nativePanelActive || store.busy || store.loadingDrop || !store.pendingURLs.isEmpty || store.showUnlock ||
+        store.preview.requested || store.preview.busy || store.panels.occupied || store.nativePanelActive || store.busy || store.loadingDrop || !store.pendingURLs.isEmpty || store.showUnlock ||
         store.showResults || store.notice != nil || showPasswordChange || showRecoverySetup || showHelp || showPasswordApp
     }
     private var externalRequestState: String { "\(requests.revision)-\(externalRequestsBlocked)-\(store.password.isEmpty)" }
@@ -339,6 +350,10 @@ struct ContentView: View {
                                 .accessibilityLabel(item.warning != nil || item.originalRetained ? "需要检查" : "密文记录")
                         }.padding(.vertical, 5).tag(item.id)
                     }.listStyle(.inset).scrollContentBackground(.hidden)
+                        .onKeyPress(.space) {
+                            guard selectedItems.count == 1, !externalRequestsBlocked else { return .ignored }
+                            previewSelection(); return .handled
+                        }
                 }
                 Divider()
                 HStack {
@@ -356,6 +371,10 @@ struct ContentView: View {
         .onChange(of: attentionOnly) { _, _ in retainVisibleSelection() }
     }
 
+    private func previewSelection() {
+        guard !externalRequestsBlocked, let item = selectedItems.first, selectedItems.count == 1 else { return }
+        store.preview.begin(item)
+    }
     private func retainVisibleSelection() {
         store.selection.formIntersection(Set(filteredItems.map(\.id)))
     }
@@ -383,6 +402,7 @@ struct ContentView: View {
                     }
                     HStack {
                         Button("解密…") { decryptPassword = ""; store.showUnlock = true }.buttonStyle(BrandPrimaryButtonStyle())
+                        Button { previewSelection() } label: { Label("预览", systemImage: "eye") }.help("选择文件后按空格预览")
                         Button("在 Finder 中显示") { NSWorkspace.shared.activateFileViewerSelecting([item.resolve()]) }
                     }
                     if let warning = item.warning { Text(warning).font(.callout).foregroundStyle(.orange) }
@@ -668,6 +688,10 @@ struct ContentView: View {
         }.padding(28).frame(width: 510)
     }
 
+    private var prefersDecryptionTouchID: Bool {
+        store.touchIDEnabled && store.touchIDAvailable && !useRecovery && decryptPassword.isEmpty
+    }
+
     private var decryptionSheet: some View {
         VStack(alignment: .leading, spacing: 18) {
             Image(systemName: "lock.open").font(.largeTitle).foregroundStyle(accent)
@@ -687,10 +711,8 @@ struct ContentView: View {
                     Button("选择目录…") { if let folder = store.chooseRestoreFolder() { restoreFolder = folder } }
                 }
             }
-            if store.touchIDEnabled && !useRecovery && !restoreElsewhere {
-                Button { Task { await store.unlockWithTouchID(decrypt: true) } } label: { Label("使用 Touch ID 解密", systemImage: "touchid") }
-                    .disabled(store.busy || !store.touchIDAvailable)
-                Text("适用于使用本机主密码加密的文件；其他文件请输入对应密码。").font(.caption).foregroundStyle(.secondary)
+            if store.touchIDEnabled && !useRecovery {
+                Text("优先使用 Touch ID。取消验证后可输入密码；其他密码加密的文件需输入对应密码。").font(.caption).foregroundStyle(.secondary)
             }
             Text(restoreElsewhere ? "在所选目录恢复原名称和内容，保留原密文。遇到同名文件会停止，不覆盖。" : "在当前目录恢复加密前的原名称与格式。成功后移除密文；遇到其他同名文件会停止，不覆盖。").font(.caption).foregroundStyle(.secondary)
             HStack {
@@ -702,11 +724,32 @@ struct ContentView: View {
                     decryptPassword = ""; recoveryInput = ""
                     Task { await store.decryptSelected(with: secret, destination: destination, recovery: key) }
                 }.buttonStyle(BrandPrimaryButtonStyle())
+                    .keyboardShortcut(prefersDecryptionTouchID ? nil : .defaultAction)
                     .disabled((useRecovery ? recoveryInput.isEmpty : decryptPassword.isEmpty) || (restoreElsewhere && restoreFolder == nil))
-                    .keyboardShortcut(.defaultAction)
+                if store.touchIDEnabled && store.touchIDAvailable && !useRecovery {
+                    Button {
+                        let destination = restoreElsewhere ? restoreFolder : nil
+                        Task { await store.unlockWithTouchID(decrypt: true, destination: destination) }
+                    } label: { Label("Touch ID 解密", systemImage: "touchid") }
+                        .buttonStyle(BrandPrimaryButtonStyle())
+                        .keyboardShortcut(prefersDecryptionTouchID ? .defaultAction : nil)
+                        .disabled(restoreElsewhere && restoreFolder == nil)
+                }
             }
         }.padding(28).frame(width: 460)
-            .onDisappear { decryptPassword = ""; recoveryInput = ""; restoreFolder = nil; restoreElsewhere = false; useRecovery = false }
+            .disabled(store.busy)
+            .interactiveDismissDisabled(store.busy)
+            .onAppear {
+                guard !didRequestDecryptionTouchID else { return }
+                didRequestDecryptionTouchID = true
+                store.refreshTouchIDAvailability()
+                guard store.touchIDEnabled, store.touchIDAvailable, !useRecovery, !restoreElsewhere else { return }
+                Task { await store.unlockWithTouchID(decrypt: true) }
+            }
+            .onDisappear {
+                decryptPassword = ""; recoveryInput = ""; restoreFolder = nil
+                restoreElsewhere = false; useRecovery = false; didRequestDecryptionTouchID = false
+            }
     }
 }
 

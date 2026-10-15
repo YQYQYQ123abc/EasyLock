@@ -3,24 +3,6 @@ import AppKit
 import ServiceManagement
 import UniformTypeIdentifiers
 
-struct LockedItem: Identifiable, Codable, Hashable {
-    var id = UUID()
-    var name: String
-    var path: String
-    var bookmark: Data?
-    let date: Date
-    let size: Int
-    var originalRetained: Bool
-    var inPlace: Bool? = nil
-    var warning: String? = nil
-    var url: URL { URL(fileURLWithPath: path) }
-    func resolve() -> URL {
-        guard let bookmark else { return url }
-        var stale = false
-        return (try? URL(resolvingBookmarkData: bookmark, options: .withSecurityScope, bookmarkDataIsStale: &stale)) ?? url
-    }
-}
-
 struct BatchOutcome: Identifiable {
     let id = UUID()
     let name: String
@@ -31,9 +13,10 @@ struct BatchOutcome: Identifiable {
 @MainActor @Observable
 final class VaultStore {
     let panels = PanelCoordinator()
+    let preview = PrivatePreview()
     private(set) var nativePanelActive = false
     var canPresentPicker: Bool {
-        !busy && !loadingDrop && !panels.occupied && !nativePanelActive && pendingURLs.isEmpty && !showUnlock && !showResults && notice == nil
+        !preview.requested && !preview.busy && !busy && !loadingDrop && !panels.occupied && !nativePanelActive && pendingURLs.isEmpty && !showUnlock && !showResults && notice == nil
     }
     private func runNativePanel(_ panel: NSSavePanel) -> NSApplication.ModalResponse {
         guard !nativePanelActive else { return .abort }
@@ -241,7 +224,7 @@ final class VaultStore {
         }
     }
 
-    func unlockWithTouchID(decrypt: Bool = false) async {
+    func unlockWithTouchID(decrypt: Bool = false, destination: URL? = nil) async {
         guard !busy, touchIDEnabled else { return }
         busy = true; progress = "等待 Touch ID 验证…"
         let epoch = sessionEpoch
@@ -254,7 +237,7 @@ final class VaultStore {
             autoLock.touch()
             password = secret
             busy = false
-            if decrypt { await decryptSelected(with: secret) }
+            if decrypt { await decryptSelected(with: secret, destination: destination) }
         } catch {
             busy = false
             if !TouchIDVault.isCancellation(error) { notice = error.localizedDescription }
@@ -263,6 +246,7 @@ final class VaultStore {
     }
 
     func lockSession() {
+        preview.close()
         PasswordAppSupport.clearOwnedClipboard()
         sessionEpoch = UUID(); sessionRevision += 1
         password = ""; selection.removeAll(); pendingURLs = []

@@ -3,7 +3,7 @@ import Observation
 
 /// Serializes presentation and waits for the actual dismissal callback, not a timer.
 @MainActor @Observable final class PanelCoordinator {
-    enum Panel: String, Identifiable { case encrypt, decrypt, results, passwordApp, help, passwordChange, recoverySetup, notice; var id: String { rawValue } }
+    enum Panel: String, Identifiable { case encrypt, decrypt, results, passwordApp, help, passwordChange, recoverySetup, notice, preview; var id: String { rawValue } }
     private(set) var presented: Panel?
     private(set) var current: Panel?
     private(set) var dismissing = false

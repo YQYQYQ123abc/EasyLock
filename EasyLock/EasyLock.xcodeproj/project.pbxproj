@@ -7,6 +7,9 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		E10000000000000000000013 = {isa = PBXBuildFile; fileRef = E10000000000000000000003; };
+		E10000000000000000000012 = {isa = PBXBuildFile; fileRef = E10000000000000000000002; };
+		E10000000000000000000011 = {isa = PBXBuildFile; fileRef = E10000000000000000000001; };
 		B7000000000000000000006B /* EasyLockPreview/PreviewProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = B70000000000000000000066 /* EasyLockPreview/PreviewProvider.swift */; };
 		B7000000000000000000006C /* PreviewShared/LockedPreview.swift in Sources */ = {isa = PBXBuildFile; fileRef = B70000000000000000000001 /* PreviewShared/LockedPreview.swift */; };
 		B7000000000000000000006D /* EasyLockPreview.appex in Embed App Extensions */ = {isa = PBXBuildFile; fileRef = B70000000000000000000065 /* EasyLockPreview.appex */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
@@ -59,6 +62,9 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		E10000000000000000000003 = {isa = PBXFileReference; lastKnownFileType = image.png; path = EasyLockThumbnail/LockedInfo.png; sourceTree = "<group>"; };
+		E10000000000000000000002 = {isa = PBXFileReference; lastKnownFileType = image.png; path = EasyLockThumbnail/InvalidThumbnail.png; sourceTree = "<group>"; };
+		E10000000000000000000001 = {isa = PBXFileReference; lastKnownFileType = image.png; path = EasyLockThumbnail/LockedThumbnail.png; sourceTree = "<group>"; };
 		7DEA656C307A286100FFA269 /* EasyLock.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = EasyLock.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		B70000000000000000000001 /* PreviewShared/LockedPreview.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PreviewShared/LockedPreview.swift; sourceTree = "<group>"; };
 		B70000000000000000000065 /* EasyLockPreview.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = EasyLockPreview.appex; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -107,6 +113,9 @@
 			children = (
 				D90000000000000000000101 /* EasyLockPreview/PrivacyInfo.xcprivacy */,
 				D90000000000000000000201 /* EasyLockThumbnail/PrivacyInfo.xcprivacy */,
+				E10000000000000000000003,
+				E10000000000000000000002,
+				E10000000000000000000001,
 				D90000000000000000000301 /* EasyLockWidget/PrivacyInfo.xcprivacy */,
 				7DEA656E307A286100FFA269 /* EasyLock */,
 				C80000000000000000000003 /* EasyLockWidget/EasyLockWidget.swift */,
@@ -250,6 +259,9 @@
 			isa = PBXResourcesBuildPhase;
 			files = (
 				D90000000000000000000202 /* EasyLockThumbnail/PrivacyInfo.xcprivacy in Resources */,
+				E10000000000000000000013,
+				E10000000000000000000012,
+				E10000000000000000000011,
 			);
 		};
 		D90000000000000000000303 /* Resources */ = {
@@ -435,7 +447,7 @@
 				CODE_SIGN_ENTITLEMENTS = EasyLock/EasyLock.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 9;
+				CURRENT_PROJECT_VERSION = 13;
 				DEVELOPMENT_TEAM = 6A3DJUV3HC;
 				ENABLE_APP_SANDBOX = YES;
 				ENABLE_HARDENED_RUNTIME = YES;
@@ -449,7 +461,7 @@
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
-				MARKETING_VERSION = 0.8.1;
+				MARKETING_VERSION = 0.8.2;
 				PRODUCT_BUNDLE_IDENTIFIER = "com.Only-You.EasyLock";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				REGISTER_APP_GROUPS = NO;
@@ -470,7 +482,7 @@
 				CODE_SIGN_ENTITLEMENTS = EasyLock/EasyLock.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 9;
+				CURRENT_PROJECT_VERSION = 13;
 				DEVELOPMENT_TEAM = 6A3DJUV3HC;
 				ENABLE_APP_SANDBOX = YES;
 				ENABLE_HARDENED_RUNTIME = YES;
@@ -484,7 +496,7 @@
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
-				MARKETING_VERSION = 0.8.1;
+				MARKETING_VERSION = 0.8.2;
 				PRODUCT_BUNDLE_IDENTIFIER = "com.Only-You.EasyLock";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				REGISTER_APP_GROUPS = NO;
@@ -503,7 +515,7 @@
 				APPLICATION_EXTENSION_API_ONLY = YES;
 				CODE_SIGN_ENTITLEMENTS = EasyLockPreview/Extension.entitlements;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 9;
+				CURRENT_PROJECT_VERSION = 13;
 				DEVELOPMENT_TEAM = 6A3DJUV3HC;
 				ENABLE_APP_SANDBOX = YES;
 				ENABLE_HARDENED_RUNTIME = YES;
@@ -516,7 +528,7 @@
 					"@executable_path/../../../../Frameworks",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 14.0;
-				MARKETING_VERSION = 0.8.1;
+				MARKETING_VERSION = 0.8.2;
 				PRODUCT_BUNDLE_IDENTIFIER = "com.Only-You.EasyLock.Preview";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
@@ -530,7 +542,7 @@
 				APPLICATION_EXTENSION_API_ONLY = YES;
 				CODE_SIGN_ENTITLEMENTS = EasyLockPreview/Extension.entitlements;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 9;
+				CURRENT_PROJECT_VERSION = 13;
 				DEVELOPMENT_TEAM = 6A3DJUV3HC;
 				ENABLE_APP_SANDBOX = YES;
 				ENABLE_HARDENED_RUNTIME = YES;
@@ -543,7 +555,7 @@
 					"@executable_path/../../../../Frameworks",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 14.0;
-				MARKETING_VERSION = 0.8.1;
+				MARKETING_VERSION = 0.8.2;
 				PRODUCT_BUNDLE_IDENTIFIER = "com.Only-You.EasyLock.Preview";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
@@ -557,7 +569,7 @@
 				APPLICATION_EXTENSION_API_ONLY = YES;
 				CODE_SIGN_ENTITLEMENTS = EasyLockThumbnail/Extension.entitlements;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 9;
+				CURRENT_PROJECT_VERSION = 13;
 				DEVELOPMENT_TEAM = 6A3DJUV3HC;
 				ENABLE_APP_SANDBOX = YES;
 				ENABLE_HARDENED_RUNTIME = YES;
@@ -570,7 +582,7 @@
 					"@executable_path/../../../../Frameworks",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 14.0;
-				MARKETING_VERSION = 0.8.1;
+				MARKETING_VERSION = 0.8.2;
 				PRODUCT_BUNDLE_IDENTIFIER = "com.Only-You.EasyLock.Thumbnail";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
@@ -584,7 +596,7 @@
 				APPLICATION_EXTENSION_API_ONLY = YES;
 				CODE_SIGN_ENTITLEMENTS = EasyLockThumbnail/Extension.entitlements;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 9;
+				CURRENT_PROJECT_VERSION = 13;
 				DEVELOPMENT_TEAM = 6A3DJUV3HC;
 				ENABLE_APP_SANDBOX = YES;
 				ENABLE_HARDENED_RUNTIME = YES;
@@ -597,7 +609,7 @@
 					"@executable_path/../../../../Frameworks",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 14.0;
-				MARKETING_VERSION = 0.8.1;
+				MARKETING_VERSION = 0.8.2;
 				PRODUCT_BUNDLE_IDENTIFIER = "com.Only-You.EasyLock.Thumbnail";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
@@ -612,7 +624,7 @@
 				CODE_SIGN_ENTITLEMENTS = EasyLockWidget/Extension.entitlements;
 				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 9;
+				CURRENT_PROJECT_VERSION = 13;
 				DEVELOPMENT_TEAM = 6A3DJUV3HC;
 				ENABLE_APP_SANDBOX = YES;
 				ENABLE_HARDENED_RUNTIME = YES;
@@ -624,7 +636,7 @@
 					"@executable_path/../../../../Frameworks",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 14.0;
-				MARKETING_VERSION = 0.8.1;
+				MARKETING_VERSION = 0.8.2;
 				PRODUCT_BUNDLE_IDENTIFIER = "com.Only-You.EasyLock.Widget";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				REGISTER_APP_GROUPS = NO;
@@ -640,7 +652,7 @@
 				CODE_SIGN_ENTITLEMENTS = EasyLockWidget/Extension.entitlements;
 				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 9;
+				CURRENT_PROJECT_VERSION = 13;
 				DEVELOPMENT_TEAM = 6A3DJUV3HC;
 				ENABLE_APP_SANDBOX = YES;
 				ENABLE_HARDENED_RUNTIME = YES;
@@ -652,7 +664,7 @@
 					"@executable_path/../../../../Frameworks",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 14.0;
-				MARKETING_VERSION = 0.8.1;
+				MARKETING_VERSION = 0.8.2;
 				PRODUCT_BUNDLE_IDENTIFIER = "com.Only-You.EasyLock.Widget";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				REGISTER_APP_GROUPS = NO;

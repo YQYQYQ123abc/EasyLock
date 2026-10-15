@@ -7,7 +7,7 @@ struct EasyLockApp: App {
     var body: some Scene {
         Window("EasyLock", id: "main") {
             ContentView(store: store)
-                .modifier(MainWindowRegistration(delegate: appDelegate))
+                .modifier(MainWindowRegistration(delegate: appDelegate, preview: store.preview))
 
         }
         .defaultSize(width: 1060, height: 720)
@@ -26,7 +26,14 @@ struct EasyLockApp: App {
 private struct MainWindowRegistration: ViewModifier {
     @Environment(\.openWindow) private var openWindow
     let delegate: FinderService
+    let preview: PrivatePreview
     func body(content: Content) -> some View {
-        content.onAppear { delegate.openMainWindow = { openWindow(id: "main") } }
+        content.onAppear {
+            delegate.openMainWindow = { openWindow(id: "main") }
+            delegate.closePrivatePreview = {
+                preview.close()
+                while preview.busy { try? await Task.sleep(for: .milliseconds(50)) }
+            }
+        }
     }
 }

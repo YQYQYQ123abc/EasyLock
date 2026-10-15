@@ -3,6 +3,19 @@ import AppKit
 @MainActor
 final class FinderService: NSObject, NSApplicationDelegate {
     var openMainWindow: (() -> Void)?
+    var closePrivatePreview: (() async -> Void)?
+    private var terminating = false
+
+    func applicationShouldTerminate(_ sender: NSApplication) -> NSApplication.TerminateReply {
+        guard let closePrivatePreview else { return .terminateNow }
+        guard !terminating else { return .terminateLater }
+        terminating = true
+        Task {
+            await closePrivatePreview()
+            sender.reply(toApplicationShouldTerminate: true)
+        }
+        return .terminateLater
+    }
 
     func applicationWillTerminate(_ notification: Notification) { PasswordAppSupport.clearOwnedClipboard() }
 

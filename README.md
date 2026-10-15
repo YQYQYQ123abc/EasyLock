@@ -7,9 +7,9 @@
 
 [查看测试版本](https://github.com/YQYQYQ123abc/EasyLock/releases) · [使用支持](https://yqyqyq123abc.github.io/EasyLock/support.html) · [隐私说明](https://yqyqyq123abc.github.io/EasyLock/privacy.html) · [反馈问题](https://github.com/YQYQYQ123abc/EasyLock/issues)
 
-## 0.8.1 预览版界面更新
+## 0.8.2 预览版 · 构建 13
 
-居中解锁页、文件列表与详情分栏、分组设置和蓝紫配色。保留批量解密与恢复入口；完整变更和升级步骤见 [发布说明](EasyLock/Distribution/ReleaseNotes/0.8.1-preview.1.md)。
+优先使用 Touch ID 解密，支持验证后的应用内私密预览，更新 Finder 上锁提示，并修复预览组件关闭时的崩溃路径。完整变更、测试范围和升级步骤见 [发布说明](EasyLock/Distribution/ReleaseNotes/0.8.2-preview.1.md)。
 
 ## 可以做什么
 

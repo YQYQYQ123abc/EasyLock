@@ -30,3 +30,6 @@ xcrun swiftc -module-cache-path /tmp/EasyLock-module-cache EasyLock/SensitiveCli
 
 xcrun swiftc -module-cache-path /tmp/EasyLock-module-cache EasyLock/PanelCoordinator.swift Tests/PanelCoordinatorTests.swift -o "$work_dir/PanelCoordinatorTests"
 "$work_dir/PanelCoordinatorTests"
+
+xcrun swiftc -module-cache-path /tmp/EasyLock-module-cache "${engine_sources[@]}" EasyLock/LockedItem.swift EasyLock/TouchIDVault.swift EasyLock/PrivatePreview.swift Tests/PrivatePreviewTests.swift -o "$work_dir/PrivatePreviewTests"
+"$work_dir/PrivatePreviewTests"
