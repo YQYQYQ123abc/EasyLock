@@ -13,10 +13,12 @@ struct BatchOutcome: Identifiable {
 @MainActor @Observable
 final class VaultStore {
     let panels = PanelCoordinator()
+    var localPreview: LocalPreviewItem?
     let preview = PrivatePreview()
+    let localFiles = LocalFilesBrowser()
     private(set) var nativePanelActive = false
     var canPresentPicker: Bool {
-        !preview.requested && !preview.busy && !busy && !loadingDrop && !panels.occupied && !nativePanelActive && pendingURLs.isEmpty && !showUnlock && !showResults && notice == nil
+        localPreview == nil && !preview.requested && !preview.busy && !busy && !loadingDrop && !panels.occupied && !nativePanelActive && pendingURLs.isEmpty && !showUnlock && !showResults && notice == nil
     }
     private func runNativePanel(_ panel: NSSavePanel) -> NSApplication.ModalResponse {
         guard !nativePanelActive else { return .abort }
@@ -63,7 +65,14 @@ final class VaultStore {
     private var credential: PasswordCredential?
     private var credentialURL: URL { indexURL.deletingLastPathComponent().appendingPathComponent("credential.json") }
     private var recoveryPublicURL: URL { indexURL.deletingLastPathComponent().appendingPathComponent("recovery-public.key") }
-    var pendingURLs: [URL] = []
+    @ObservationIgnored private var pendingAccess: ScopedFileAccess?
+    @ObservationIgnored private var pendingFolderAccess: [ScopedFileAccess] = []
+    var pendingURLs: [URL] = [] {
+        didSet {
+            pendingAccess = pendingURLs.isEmpty ? nil : ScopedFileAccess(pendingURLs)
+            pendingFolderAccess = []
+        }
+    }
     var showUnlock = false
     private(set) var loadingDrop = false
     var touchIDEnabled = UserDefaults.standard.bool(forKey: "touchIDEnabled")
@@ -186,6 +195,15 @@ final class VaultStore {
         UserDefaults.standard.set(value, forKey: "autoLockMinutes")
     }
 
+    func authorizePendingSources() async {
+        guard !busy, !inspectingSources else { return }
+        for source in pendingURLs {
+            guard let parent = authorizedFolder(for: source) else { return }
+            pendingFolderAccess.append(ScopedFileAccess([parent]))
+        }
+        await inspectPendingSources()
+    }
+
     func inspectPendingSources() async {
         guard !inspectingSources else { return }
         let sources = pendingURLs
@@ -224,6 +242,25 @@ final class VaultStore {
         }
     }
 
+    func verifyCurrentPasswordWithTouchID() async -> String? {
+        guard !busy, touchIDEnabled, touchIDAvailable else { return nil }
+        busy = true; progress = "等待 Touch ID 验证…"
+        let epoch = sessionEpoch
+        defer { busy = false }
+        do {
+            let secret = try await TouchIDVault.unlock()
+            guard let credential, try await Task.detached(operation: { try credential.matches(secret) }).value else {
+                throw LockEngine.Failure.message("Touch ID 保存的密码已失效，请输入当前主密码并重新启用 Touch ID。")
+            }
+            guard epoch == sessionEpoch else { return nil }
+            autoLock.touch()
+            return secret
+        } catch {
+            if epoch == sessionEpoch && !TouchIDVault.isCancellation(error) { notice = error.localizedDescription }
+            return nil
+        }
+    }
+
     func unlockWithTouchID(decrypt: Bool = false, destination: URL? = nil) async {
         guard !busy, touchIDEnabled else { return }
         busy = true; progress = "等待 Touch ID 验证…"
@@ -246,12 +283,44 @@ final class VaultStore {
     }
 
     func lockSession() {
+        localPreview = nil
+        localFiles.close()
         preview.close()
         PasswordAppSupport.clearOwnedClipboard()
         sessionEpoch = UUID(); sessionRevision += 1
         password = ""; selection.removeAll(); pendingURLs = []
         guestDecrypt = false; showUnlock = false; showResults = false; notice = nil
         if busy { operationControl?.cancel(); cancellationRequested = true }
+    }
+
+    func previewLocalFile(_ entry: LocalFileEntry) {
+        guard canPresentPicker, entry.state != .unavailable, let root = localFiles.root else { return }
+        do {
+            if try !entry.folder && LockEngine.isEncrypted(entry.url) {
+                let bookmark = try entry.url.bookmarkData(options: .withSecurityScope, includingResourceValuesForKeys: nil, relativeTo: nil)
+                preview.begin(LockedItem(name: entry.url.pathExtension.lowercased() == "easylock" ? entry.url.deletingPathExtension().lastPathComponent : entry.url.lastPathComponent, path: entry.url.path, bookmark: bookmark, date: Date(), size: entry.size, originalRetained: false))
+            } else {
+                localPreview = LocalPreviewItem(url: entry.url, folder: entry.folder, root: root)
+            }
+        } catch { notice = "无法开始预览：\(error.localizedDescription)" }
+    }
+
+    func chooseBrowsingFolder() -> URL? {
+        guard canPresentPicker else { return nil }
+        let panel = NSOpenPanel()
+        panel.title = "选择允许 EasyLock 浏览的文件夹"
+        panel.message = "可选择个人主目录或任意文件夹。只浏览授权范围，文件内容不会上传。"
+        panel.canChooseDirectories = true; panel.canChooseFiles = false
+        panel.allowsMultipleSelection = false; panel.prompt = "允许浏览"
+        guard runNativePanel(panel) == .OK, let url = panel.url else { return nil }
+        let access = url.startAccessingSecurityScopedResource()
+        defer { if access { url.stopAccessingSecurityScopedResource() } }
+        do {
+            let path = url.resolvingSymlinksInPath().standardizedFileURL.path
+            directoryBookmarks[path] = try url.bookmarkData(options: .withSecurityScope, includingResourceValuesForKeys: nil, relativeTo: nil)
+            UserDefaults.standard.set(directoryBookmarks, forKey: "directoryBookmarks")
+        } catch { notice = "无法保存授权：\(error.localizedDescription)" }
+        return url
     }
 
     func chooseSources(foldersOnly: Bool = false) {
@@ -300,9 +369,9 @@ final class VaultStore {
 
     /// Selecting a file alone does not authorize creating/renaming its siblings in App Sandbox.
     /// Ask for its containing folder, never for a different output location.
-    private func authorizedFolder(for url: URL) -> URL? {
+    private func authorizedFolder(for url: URL, forcePrompt: Bool = false) -> URL? {
         let parent = url.deletingLastPathComponent().resolvingSymlinksInPath().standardizedFileURL
-        for (_, data) in directoryBookmarks {
+        for (_, data) in directoryBookmarks where !forcePrompt {
             var stale = false
             if let resolved = try? URL(resolvingBookmarkData: data, options: .withSecurityScope, bookmarkDataIsStale: &stale),
                !stale, (parent.path + "/").hasPrefix(resolved.resolvingSymlinksInPath().standardizedFileURL.path + "/") {
@@ -394,16 +463,22 @@ final class VaultStore {
         } catch { notice = error.localizedDescription }
     }
 
-    func recover(_ item: TransactionRecovery.Item, discard: Bool = false) async {
+    func recover(_ item: TransactionRecovery.Item, discard: Bool = false, reauthorize: Bool = false) async {
         guard !busy else { return }
         let parent = item.folder.deletingLastPathComponent()
-        guard let data = recoveryAccess[parent.path] ?? recoveryFolders[parent.path] else { notice = "请重新选择恢复目录。"; return }
         do {
             var stale = false
-            let authorized = try URL(resolvingBookmarkData: data, options: .withSecurityScope, bookmarkDataIsStale: &stale)
+            let data = recoveryAccess[parent.path] ?? recoveryFolders[parent.path]
+            let resolved = data.flatMap { try? URL(resolvingBookmarkData: $0, options: .withSecurityScope, bookmarkDataIsStale: &stale) }
+            let authorized: URL
+            if reauthorize || stale || resolved == nil {
+                guard let selected = authorizedFolder(for: item.folder, forcePrompt: true) else { return }
+                authorized = selected
+            } else { authorized = resolved! }
             let access = authorized.startAccessingSecurityScopedResource()
             defer { if access { authorized.stopAccessingSecurityScopedResource() } }
-            busy = true; progress = "正在恢复任务…"
+            try rememberRecoveryParent(item.folder)
+            busy = true; progress = discard ? "正在清理未提交的临时副本…" : "正在恢复任务…"
             do {
                 try await Task.detached {
                     if discard { try TransactionRecovery.discard(item) }
@@ -417,15 +492,22 @@ final class VaultStore {
                         try register(url, size: size, originalRetained: true, warning: "中断任务已恢复，原文件或其他副本仍保留。")
                     }
                 }
-            } catch { notice = error.localizedDescription }
+            } catch {
+                notice = "\(discard ? "清理临时副本" : "恢复任务")未完成：\(error.localizedDescription)\n\n恢复目录：\(item.folder.path)\n若提示没有权限，请使用此任务下的“重新授权并重试”，选择恢复目录的上级文件夹。已发布的文件不会被清理；剩余恢复数据保留供检查。"
+            }
             busy = false
-        } catch { notice = error.localizedDescription }
+        } catch {
+                notice = "\(discard ? "清理临时副本" : "恢复任务")未完成：\(error.localizedDescription)\n\n恢复目录：\(item.folder.path)\n若提示没有权限，请使用此任务下的“重新授权并重试”，选择恢复目录的上级文件夹。已发布的文件不会被清理；剩余恢复数据保留供检查。"
+            }
         await scanRecoveries()
         refreshMonitors()
     }
 
     func encryptPending() async {
         guard !busy, !password.isEmpty, !pendingURLs.isEmpty else { return }
+        let access = pendingAccess
+        let folderAccess = pendingFolderAccess
+        defer { withExtendedLifetime((access, folderAccess)) {} }
         let sources = pendingURLs; pendingURLs = []
         let epoch = sessionEpoch
         busy = true

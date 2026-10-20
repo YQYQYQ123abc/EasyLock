@@ -45,7 +45,8 @@ final class FinderService: NSObject, NSApplicationDelegate {
     }
 
     @objc func encryptWithEasyLock(_ pasteboard: NSPasteboard, userData: String?, error: AutoreleasingUnsafeMutablePointer<NSString?>) {
-        guard let urls = pasteboard.readObjects(forClasses: [NSURL.self], options: [.urlReadingFileURLsOnly: true]) as? [URL], !urls.isEmpty else {
+        let urls = FinderSelectionReader.urls(from: pasteboard)
+        guard !urls.isEmpty else {
             error.pointee = "请选择文件或文件夹。"
             return
         }

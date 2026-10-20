@@ -4,7 +4,7 @@ cd "$(dirname "$0")/.."
 engine_sources=(EasyLock/FileMetadata.swift EasyLock/LockEngine.swift EasyLock/LockTransactions.swift EasyLock/OperationControl.swift EasyLock/StreamArchive.swift EasyLock/TransactionRecovery.swift EasyLock/SpacePreflight.swift EasyLock/RecoveryKey.swift EasyLock/RestoreCopy.swift EasyLock/PasswordCredential.swift)
 work_dir=$(mktemp -d "${TMPDIR:-/tmp}/easylock-validation.XXXXXX")
 trap 'rm -rf "$work_dir"' EXIT
-for suite in EngineTests InPlaceTests MetadataPolicyTests StreamRecoveryTests ReleaseSafetyTests; do
+for suite in EngineTests InPlaceTests MetadataPolicyTests StreamRecoveryTests ReleaseSafetyTests DisposableCleanupTests; do
   xcrun swiftc -module-cache-path /tmp/EasyLock-module-cache "${engine_sources[@]}" "Tests/$suite.swift" -o "$work_dir/$suite"
   "$work_dir/$suite"
 done
@@ -33,3 +33,20 @@ xcrun swiftc -module-cache-path /tmp/EasyLock-module-cache EasyLock/PanelCoordin
 
 xcrun swiftc -module-cache-path /tmp/EasyLock-module-cache "${engine_sources[@]}" EasyLock/LockedItem.swift EasyLock/TouchIDVault.swift EasyLock/PrivatePreview.swift Tests/PrivatePreviewTests.swift -o "$work_dir/PrivatePreviewTests"
 "$work_dir/PrivatePreviewTests"
+
+xcrun swiftc -module-cache-path /tmp/EasyLock-module-cache EasyLock/FinderSelectionReader.swift Tests/FinderSelectionReaderTests.swift -o "$work_dir/FinderSelectionReaderTests"
+"$work_dir/FinderSelectionReaderTests"
+
+xcrun swiftc -module-cache-path /tmp/EasyLock-module-cache "${engine_sources[@]}" EasyLock/ScopedFileAccess.swift EasyLock/LocalFilesBrowser.swift Tests/LocalFilesBrowserTests.swift -o "$work_dir/LocalFilesBrowserTests"
+"$work_dir/LocalFilesBrowserTests"
+
+xcrun swiftc -module-cache-path /tmp/EasyLock-module-cache "${engine_sources[@]}" EasyLock/ScopedFileAccess.swift EasyLock/LocalFilesBrowser.swift Tests/BrowserNavigationTests.swift -o "$work_dir/BrowserNavigationTests"
+"$work_dir/BrowserNavigationTests"
+
+xcrun swiftc -module-cache-path /tmp/EasyLock-module-cache EasyLock/RasterPreview.swift Tests/RasterPreviewTests.swift -o "$work_dir/RasterPreviewTests"
+"$work_dir/RasterPreviewTests"
+
+xcrun swiftc -module-cache-path /tmp/EasyLock-module-cache EasyLock/PanelCoordinator.swift EasyLock/PreviewWindow.swift Tests/PreviewWindowTests.swift -o "$work_dir/PreviewWindowTests"
+"$work_dir/PreviewWindowTests"
+xcrun swiftc -module-cache-path /tmp/EasyLock-module-cache EasyLock/ManagedQuickLookView.swift Tests/QuickLookLifecycleTests.swift -o "$work_dir/QuickLookLifecycleTests"
+"$work_dir/QuickLookLifecycleTests"

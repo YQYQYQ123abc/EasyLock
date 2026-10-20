@@ -61,12 +61,73 @@ enum TransactionRecovery {
         try JSONEncoder().encode(journal).write(to: path, options: .atomic)
         try LockEngine.synchronize(path)
         // Never remove the published result. Only disposable transaction artifacts remain.
-        try FileManager.default.removeItem(at: item.folder)
+        try removeDisposableTree(item.folder)
         try LockEngine.synchronizeDirectory(current.source.deletingLastPathComponent())
+    }
+    /// Only call after transaction state validation, or for the disposable verification copy.
+    /// Walk by descriptor so links cannot redirect permission changes outside the temporary tree.
+    static func removeDisposableTree(_ url: URL) throws {
+        let parent = url.deletingLastPathComponent()
+        guard url.lastPathComponent.hasPrefix(".easylock-transaction-") ||
+                (url.lastPathComponent == "verification" && parent.lastPathComponent.hasPrefix(".easylock-transaction-")) else {
+            throw LockEngine.Failure.message("拒绝清理非事务临时目录。")
+        }
+        let descriptor = open(parent.path, O_RDONLY | O_DIRECTORY | O_NOFOLLOW)
+        guard descriptor >= 0 else { throw FileMetadata.posix("无法访问临时目录的上级文件夹", parent) }
+        defer { close(descriptor) }
+        try removeEntry(url.lastPathComponent, parent: descriptor, display: url)
+    }
+    /// The caller holds the preview workspace lease. Only its fixed session child is disposable.
+    static func removePreviewSession(in root: URL) throws {
+        let descriptor = open(root.path, O_RDONLY | O_DIRECTORY | O_NOFOLLOW)
+        guard descriptor >= 0 else { throw FileMetadata.posix("无法访问预览临时目录", root) }
+        defer { close(descriptor) }
+        var owner = stat()
+        guard fstat(descriptor, &owner) == 0, owner.st_uid == getuid() else {
+            throw LockEngine.Failure.message("预览临时目录所有者已变化，已停止清理。")
+        }
+        var info = stat()
+        if fstatat(descriptor, "session", &info, AT_SYMLINK_NOFOLLOW) != 0 {
+            if errno == ENOENT { return }
+            throw FileMetadata.posix("无法检查预览临时目录", root)
+        }
+        try removeEntry("session", parent: descriptor, display: root.appendingPathComponent("session"))
+    }
+    private static func removeEntry(_ name: String, parent: Int32, display: URL) throws {
+        var info = stat()
+        guard fstatat(parent, name, &info, AT_SYMLINK_NOFOLLOW) == 0 else { throw FileMetadata.posix("无法检查临时项目", display) }
+        if info.st_mode & S_IFMT == S_IFDIR {
+            let descriptor = openat(parent, name, O_RDONLY | O_DIRECTORY | O_NOFOLLOW)
+            guard descriptor >= 0 else { throw FileMetadata.posix("无法打开临时目录", display) }
+            defer { close(descriptor) }
+            var opened = stat()
+            guard fstat(descriptor, &opened) == 0, opened.st_uid == getuid(), opened.st_ino == info.st_ino, opened.st_dev == info.st_dev else {
+                throw LockEngine.Failure.message("临时目录所有者或状态已变化，已停止清理。")
+            }
+            guard fchmod(descriptor, (opened.st_mode & 0o777) | 0o700) == 0 else { throw FileMetadata.posix("无法清理只读临时目录", display) }
+            let duplicate = dup(descriptor)
+            guard duplicate >= 0 else { throw FileMetadata.posix("无法读取临时目录", display) }
+            guard let stream = fdopendir(duplicate) else { close(duplicate); throw FileMetadata.posix("无法枚举临时目录", display) }
+            defer { closedir(stream) }
+            while true {
+                errno = 0
+                guard let entry = readdir(stream) else {
+                    if errno != 0 { throw FileMetadata.posix("读取临时目录失败", display) }
+                    break
+                }
+                let child = withUnsafePointer(to: &entry.pointee.d_name) {
+                    $0.withMemoryRebound(to: CChar.self, capacity: Int(entry.pointee.d_namlen) + 1) { String(cString: $0) }
+                }
+                if child != "." && child != ".." { try removeEntry(child, parent: descriptor, display: display.appendingPathComponent(child)) }
+            }
+            guard unlinkat(parent, name, AT_REMOVEDIR) == 0 else { throw FileMetadata.posix("无法移除临时目录", display) }
+        } else {
+            guard unlinkat(parent, name, 0) == 0 else { throw FileMetadata.posix("无法移除临时副本", display) }
+        }
     }
     static func discard(_ item: Item) throws {
         guard try inspect(item.folder).canDiscard else { throw LockEngine.Failure.message("恢复状态已变化，未清理任何文件。") }
-        try FileManager.default.removeItem(at: item.folder)
+        try removeDisposableTree(item.folder)
         try LockEngine.synchronizeDirectory(item.folder.deletingLastPathComponent())
     }
 }

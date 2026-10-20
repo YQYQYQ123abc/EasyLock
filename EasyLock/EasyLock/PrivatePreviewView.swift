@@ -4,8 +4,8 @@ import Quartz
 struct PrivatePreviewView: View {
     @Bindable var preview: PrivatePreview
     let touchIDEnabled: Bool
-    @State private var expanded = false
-    @State private var availableSize = NSScreen.main?.visibleFrame.size ?? CGSize(width: 1280, height: 800)
+    @State private var didRequestTouchID = false
+    @State private var showInfo = false
     @State private var secret = ""
     @State private var recovery = false
     @State private var chosen: URL?
@@ -13,27 +13,13 @@ struct PrivatePreviewView: View {
     @State private var entries: [URL] = []
     @State private var browseError: String?
     var body: some View {
-        VStack(alignment: .leading, spacing: 14) {
-            HStack {
-                Image(systemName: "lock.shield").font(.title2).foregroundStyle(.tint)
-                VStack(alignment: .leading, spacing: 3) {
-                    Text("私密预览").font(.caption).foregroundStyle(.secondary)
-                    Text(preview.item?.name ?? "验证后查看内容")
-                        .font(.headline).lineLimit(1).truncationMode(.middle)
-                        .help(preview.item?.name ?? "私密预览")
-                }
-                Spacer()
-                Button { expanded.toggle() } label: {
-                    Image(systemName: expanded ? "arrow.down.right.and.arrow.up.left" : "arrow.up.left.and.arrow.down.right")
-                }.help(expanded ? "恢复预览尺寸" : "扩大预览")
-                Button("关闭") { preview.close() }.keyboardShortcut(.cancelAction)
-            }
+        VStack(alignment: .leading, spacing: 0) {
             if let root = preview.restored {
                 if root.hasDirectoryPath || (try? root.resourceValues(forKeys: [.isDirectoryKey]).isDirectory) == true {
                     HStack {
                         Button("上一级") { load((directory ?? root).deletingLastPathComponent()) }.disabled(directory == root || directory == nil)
                         Text(directory?.lastPathComponent ?? root.lastPathComponent).lineLimit(1)
-                    }
+                    }.padding(10)
                     HSplitView {
                         List(entries, id: \.self, selection: $chosen) { entry in
                             Label(entry.lastPathComponent, systemImage: entry.hasDirectoryPath ? "folder" : "doc")
@@ -44,8 +30,15 @@ struct PrivatePreviewView: View {
                     }.frame(maxHeight: .infinity)
                     .onAppear { load(root) }
                 } else { PreviewContent(url: root).id(root).frame(maxHeight: .infinity) }
-                Label("原文件保持加密 · 关闭后清理临时副本 · 系统预览可能保留缓存", systemImage: "lock.fill")
-                    .font(.caption).foregroundStyle(.secondary)
+                HStack {
+                    Label("原文件保持加密", systemImage: "lock").font(.system(size: 10)).foregroundStyle(.secondary)
+                    Spacer()
+                    Button { showInfo.toggle() } label: { Image(systemName: "info.circle") }.buttonStyle(.plain).help("预览与隐私说明")
+                        .popover(isPresented: $showInfo) {
+                            Text("关闭后清理应用临时副本；异常退出后下次启动清理。系统或第三方预览扩展可能保留缓存，无法保证清除。")
+                                .font(.callout).padding(18).frame(width: 300)
+                        }
+                }.padding(.horizontal, 12).frame(height: 28)
             } else {
                 Spacer()
                 VStack(alignment: .leading, spacing: 14) {
@@ -56,21 +49,22 @@ struct PrivatePreviewView: View {
                         .onSubmit { open() }
                     HStack {
                         Button("验证并预览", action: open).buttonStyle(BrandPrimaryButtonStyle()).disabled(secret.isEmpty)
-                        if touchIDEnabled && !recovery { Button("Touch ID") { Task { await preview.openWithTouchID() } } }
+                        if touchIDEnabled && !recovery { Button("Touch ID") { Task { await preview.openWithTouchID() } }.buttonStyle(BrandPrimaryButtonStyle()) }
                     }
-                }.frame(maxWidth: 470).frame(maxWidth: .infinity).disabled(preview.busy)
+                }.frame(maxWidth: 470).padding(24).frame(maxWidth: .infinity).disabled(preview.busy)
                 if preview.busy { ProgressView("正在验证并准备临时预览…").frame(maxWidth: .infinity) }
                 Spacer()
             }
             if let message = preview.message { Text(message).font(.caption).foregroundStyle(.orange).textSelection(.enabled) }
             if let browseError { Text(browseError).font(.caption).foregroundStyle(.orange) }
-        }.padding(18).frame(width: previewSize.width, height: previewSize.height)
+        }.frame(maxWidth: .infinity, maxHeight: .infinity)
+            .task {
+                guard !didRequestTouchID else { return }
+                didRequestTouchID = true
+                guard touchIDEnabled, !recovery, secret.isEmpty, preview.restored == nil else { return }
+                await preview.openWithTouchID()
+            }
             .onDisappear { secret = ""; chosen = nil; preview.close() }
-    }
-    private var previewSize: CGSize {
-        let available = availableSize
-        return CGSize(width: min(expanded ? 1200 : 960, available.width - 80),
-                      height: min(expanded ? 860 : 680, available.height - 100))
     }
     private func open() {
         guard !secret.isEmpty, !preview.busy else { return }
@@ -98,33 +92,17 @@ private struct SecureQuickLook: NSViewRepresentable {
 
 
 /// Common raster images stay inside the app, with a predictable fit and zoom control.
-private struct PreviewContent: View {
+struct PreviewContent: View {
     let url: URL
     @State private var image: NSImage?
     @State private var loaded = false
-    @State private var zoom: CGFloat = 0
+    @State private var imageError = false
     var body: some View {
         VStack(spacing: 0) {
             if let image {
-                HStack {
-                    Text(url.lastPathComponent).lineLimit(1).truncationMode(.middle).foregroundStyle(.secondary)
-                    Spacer()
-                    Picker("图片缩放", selection: $zoom) {
-                        Text("适合窗口").tag(CGFloat(0))
-                        Text("100%").tag(CGFloat(1))
-                        Text("200%").tag(CGFloat(2))
-                    }.labelsHidden().frame(width: 140)
-                }.font(.caption).padding(10)
-                Divider()
-                GeometryReader { geometry in
-                    let fit = min(geometry.size.width / max(1, image.size.width), geometry.size.height / max(1, image.size.height))
-                    let factor = zoom == 0 ? min(1, fit) : zoom
-                    ScrollView([.horizontal, .vertical]) {
-                        Image(nsImage: image).resizable().interpolation(.high)
-                            .frame(width: image.size.width * factor, height: image.size.height * factor)
-                            .frame(minWidth: geometry.size.width, minHeight: geometry.size.height)
-                    }
-                }
+                RasterPreviewCanvas(image: image)
+            } else if imageError {
+                ContentUnavailableView("无法载入图片", systemImage: "photo", description: Text("文件可能已移动、损坏或格式不受支持。请关闭后重试。"))
             } else if loaded {
                 SecureQuickLook(url: url)
             } else {
@@ -132,15 +110,19 @@ private struct PreviewContent: View {
             }
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
-        .background(Color(nsColor: .textBackgroundColor))
-        .clipShape(RoundedRectangle(cornerRadius: 10))
-        .overlay(RoundedRectangle(cornerRadius: 10).stroke(.primary.opacity(0.08)))
-        .onAppear {
-            if ["jpg", "jpeg", "png", "heic", "heif", "tif", "tiff", "bmp", "webp"].contains(url.pathExtension.lowercased()) {
-                image = NSImage(contentsOf: url)
-            }
+        .background(Color(nsColor: .windowBackgroundColor))
+        .task(id: url) {
+            image = nil; loaded = false; imageError = false
+            guard RasterPreview.supports(url) else { loaded = true; return }
+            let worker = Task.detached(priority: .userInitiated) { RasterPreview.load(url) }
+            let result = await withTaskCancellationHandler {
+                await worker.value
+            } onCancel: { worker.cancel() }
+            guard !Task.isCancelled else { return }
+            if let result { image = NSImage(cgImage: result, size: NSSize(width: result.width, height: result.height)) }
+            else { imageError = true }
             loaded = true
         }
-        .onDisappear { image = nil; loaded = false }
+        .onDisappear { image = nil }
     }
 }

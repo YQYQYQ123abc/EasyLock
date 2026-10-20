@@ -31,7 +31,7 @@ final class PreviewWorkspace: @unchecked Sendable {
         }
         descriptor = fd
         do {
-            if FileManager.default.fileExists(atPath: folder.path) { try FileManager.default.removeItem(at: folder) }
+            try TransactionRecovery.removePreviewSession(in: root)
             try FileManager.default.createDirectory(at: folder, withIntermediateDirectories: false, attributes: [.posixPermissions: 0o700])
         } catch {
             Darwin.close(fd); descriptor = -1
@@ -39,7 +39,7 @@ final class PreviewWorkspace: @unchecked Sendable {
         }
     }
     func clean() throws {
-        if FileManager.default.fileExists(atPath: folder.path) { try FileManager.default.removeItem(at: folder) }
+        try TransactionRecovery.removePreviewSession(in: root)
     }
     deinit { if descriptor >= 0 { Darwin.close(descriptor) } }
 }

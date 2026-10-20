@@ -10,13 +10,13 @@ enum EasyLockStyle {
                            blue: CGFloat(value & 255) / 255, alpha: 1)
         })
     }
-    static let accent = adaptive(0x4569CB, 0x9AB2FF)
-    static let blue = adaptive(0x5B7FE8, 0x7F9CF5)
-    static let secondary = adaptive(0xC777C6, 0xD899D7)
-    static let background = adaptive(0xF3F3F7, 0x111218)
+    static let accent = adaptive(0x1764F5, 0x83B5FF)
+    static let blue = adaptive(0x3687FF, 0x7DBEFF)
+    static let secondary = adaptive(0x139BB5, 0x68D5E5)
+    static let background = adaptive(0xEDF1F8, 0x101722)
     static let sidebar = adaptive(0xECEDF3, 0x171821)
-    static let border = adaptive(0xE3E4EC, 0x383B4D)
-    static let buttonFill = Color(red: 0.29, green: 0.40, blue: 0.77)
+    static let border = adaptive(0xD9E2F0, 0x344256)
+    static let buttonFill = Color(red: 0.08, green: 0.36, blue: 0.96)
 }
 struct BrandMark: View {
     var size: CGFloat = 64
@@ -36,22 +36,20 @@ struct BrandLoop: Shape {
     }
 }
 struct VaultBackground: View {
-    @Environment(\.colorScheme) private var scheme
+    var body: some View { WorkspaceBackground() }
+}
+
+/// Material surfaces retain an opaque alternative for Reduce Transparency.
+struct GlassPanel: View {
+    var radius: CGFloat = 22
     @Environment(\.accessibilityReduceTransparency) private var reduceTransparency
+    @Environment(\.colorScheme) private var scheme
     var body: some View {
-        GeometryReader { proxy in
-            ZStack(alignment: .bottomTrailing) {
-                EasyLockStyle.background
-                RadialGradient(colors: [EasyLockStyle.blue.opacity(0.13), .clear], center: .topLeading, startRadius: 0, endRadius: 500)
-                RadialGradient(colors: [EasyLockStyle.secondary.opacity(0.14), .clear], center: .bottomTrailing, startRadius: 0, endRadius: 460)
-                if !reduceTransparency {
-                    BrandLoop().stroke(EasyLockStyle.blue.opacity(scheme == .dark ? 0.11 : 0.065), style: StrokeStyle(lineWidth: 16, lineCap: .round, lineJoin: .round))
-                        .frame(width: min(proxy.size.width * 0.65, 520), height: 380).offset(x: 100, y: 110)
-                    Image(systemName: "heart.fill").font(.system(size: 100)).foregroundStyle(EasyLockStyle.secondary.opacity(0.08))
-                        .rotationEffect(.degrees(-14)).offset(x: -36, y: -30)
-                }
-            }.clipped()
-        }.allowsHitTesting(false).accessibilityHidden(true)
+        RoundedRectangle(cornerRadius: radius)
+            .fill(reduceTransparency ? AnyShapeStyle(Color(nsColor: .controlBackgroundColor)) : AnyShapeStyle(.thinMaterial))
+            .overlay(RoundedRectangle(cornerRadius: radius).fill(Color.white.opacity(scheme == .dark ? 0.04 : 0.45)))
+            .overlay(RoundedRectangle(cornerRadius: radius).stroke(
+                LinearGradient(colors: [.white.opacity(scheme == .dark ? 0.20 : 0.9), EasyLockStyle.border.opacity(0.5)], startPoint: .topLeading, endPoint: .bottomTrailing), lineWidth: 1))
     }
 }
 struct BrandPrimaryButtonStyle: ButtonStyle {
@@ -60,7 +58,8 @@ struct BrandPrimaryButtonStyle: ButtonStyle {
     func makeBody(configuration: Configuration) -> some View {
         configuration.label.font(.callout.weight(.semibold)).padding(.horizontal, 17).padding(.vertical, 10)
             .foregroundStyle(.white)
-            .background(EasyLockStyle.buttonFill, in: RoundedRectangle(cornerRadius: 8))
+            .background(EasyLockStyle.buttonFill, in: RoundedRectangle(cornerRadius: 10))
+            .shadow(color: EasyLockStyle.buttonFill.opacity(enabled ? 0.14 : 0), radius: 4, y: 2)
             .offset(y: configuration.isPressed && !reduceMotion ? 2 : 0)
             .opacity(enabled ? 1 : 0.45)
             .animation(reduceMotion ? nil : .easeOut(duration: 0.12), value: configuration.isPressed)
@@ -71,8 +70,33 @@ struct BrandGroupBoxStyle: GroupBoxStyle {
         VStack(alignment: .leading, spacing: 12) {
             configuration.label.font(.headline)
             configuration.content
-        }.frame(maxWidth: .infinity, alignment: .leading).padding(14)
-            .background(Color(nsColor: .controlBackgroundColor), in: RoundedRectangle(cornerRadius: 12))
-            .overlay(RoundedRectangle(cornerRadius: 12).stroke(EasyLockStyle.border, lineWidth: 1))
+        }.frame(maxWidth: .infinity, alignment: .leading).padding(20)
+            .background { GlassPanel(radius: 18) }
+            .shadow(color: .black.opacity(0.025), radius: 12, y: 5)
+    }
+}
+
+/// Shared heading keeps page identity and typography stable while switching sections.
+struct PageHeading: View {
+    let title: String
+    let subtitle: String
+    let symbol: String
+    var body: some View {
+        HStack(spacing: 14) {
+            Image(systemName: symbol).font(.system(size: 19, weight: .medium))
+                .foregroundStyle(EasyLockStyle.accent).frame(width: 36, height: 36)
+                .background(EasyLockStyle.accent.opacity(0.09), in: RoundedRectangle(cornerRadius: 10))
+            VStack(alignment: .leading, spacing: 5) {
+                Text(title).font(.system(size: 17, weight: .semibold))
+                Text(subtitle).font(.caption).foregroundStyle(.secondary)
+                    .lineLimit(1).truncationMode(.middle).help(subtitle)
+            }
+        }.frame(maxWidth: .infinity, alignment: .leading)
+    }
+}
+
+struct WorkspaceBackground: View {
+    var body: some View {
+        Color(nsColor: .windowBackgroundColor).allowsHitTesting(false).accessibilityHidden(true)
     }
 }

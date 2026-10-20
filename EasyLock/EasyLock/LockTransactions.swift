@@ -69,7 +69,7 @@ extension LockEngine {
             try FileManager.default.createDirectory(at: verification, withIntermediateDirectories: false, attributes: [.posixPermissions: 0o700])
             _ = try StreamArchive.restore(encrypted, into: verification, password: password, control: control)
             // No original is removed unless a full restore including metadata succeeded.
-            try FileManager.default.removeItem(at: verification)
+            try TransactionRecovery.removeDisposableTree(verification)
             try checkpoint?(.verified)
             try control?.check()
             control?.update("正在安全替换，请稍候")

@@ -1,6 +1,6 @@
 # EasyLock 免费离线版发布准备
 
-截至 2026-10-13，当前为 0.8 开发预览版，尚不是已完成公证或商店审核的发行版本。官网独立版与 Mac App Store 版共用文件格式，均免费、无需账号或激活，不限制设备数量。
+截至 2026-10-20，当前为 0.8.2 Preview 2（构建 31）开发预览版，尚不是已完成公证或商店审核的发行版本。官网独立版与 Mac App Store 版共用文件格式，均免费、无需账号或激活，不限制设备数量。
 
 ## 当前发行策略
 
@@ -22,7 +22,7 @@ python3 Tests/check-offline-build.py /tmp/EasyLock-offline-store/Build/Products/
 
 本地 Release build 仍使用项目的开发签名，不等于发行 Archive、Developer ID 公证或商店分发签名。
 
-## 本次验证结果（2026-10-13）
+## 历史双渠道验证结果（2026-10-13）
 
 - 官网与商店分支均通过 Release 双架构构建（arm64 + x86_64），尚未完成 Intel 实机运行验证。
 - 两个产物的主应用与三个扩展均通过签名完整性检查，均启用沙盒且没有出站/入站网络权限。
@@ -30,6 +30,13 @@ python3 Tests/check-offline-build.py /tmp/EasyLock-offline-store/Build/Products/
 - 主应用和三个扩展的隐私清单，以及应用内离线隐私正文，已在两个渠道实际产物中验证存在并符合预期。
 - 已重新运行 Tests/run-tests.sh 全部测试及 Tests/run-sandbox-tests.sh，全部通过；真实沙盒中的 DOCX、文件夹与 .DS_Store 隔离属性往返和恢复密钥复制恢复均通过。
 - 未完成真实界面操作复验、发行 Archive、公证、商店提交或外部安全审查；本次未改动加密算法与文件替换流程。
+
+## 构建 31 的发布状态（2026-10-20）
+
+- 独立分发配置已重新构建 arm64 + x86_64 双架构包；主应用及三个扩展通过离线权限和签名完整性检查。
+- 已复验加解密、恢复、真实沙盒隔离属性及预览相关测试，范围见 [Preview 2 发布说明](ReleaseNotes/0.8.2-preview.2.md)。
+- 本机存在 Developer ID Application 证书，但本次下载包实际仍为 Apple Development 签名，未公证。证书存在不能证明发布包已完成发行签名或公证。
+- 支持与隐私页面已提供 GitHub Pages 链接。完整真机验收和外部安全审查尚未完成，当前仅作为预发布测试版。
 
 ## 上线前必须完成（按优先级）
 

@@ -15,6 +15,29 @@ import Foundation
             catch {}
             try Data("stale plaintext".utf8).write(to: first.folder.appendingPathComponent("old.txt"))
         }
+        // Stale and explicitly closed previews must remove read-only directories without following links.
+        let outside = root.appendingPathComponent("original.txt")
+        try Data("original".utf8).write(to: outside)
+        try fm.setAttributes([.posixPermissions: 0o444], ofItemAtPath: outside.path)
+        for stale in [true, false] {
+            do {
+                let workspace = try PreviewWorkspace(root: cache)
+                let readOnly = workspace.folder.appendingPathComponent("readonly")
+                try fm.createDirectory(at: readOnly, withIntermediateDirectories: false)
+                try Data("plaintext".utf8).write(to: readOnly.appendingPathComponent("secret.txt"))
+                try fm.createSymbolicLink(at: readOnly.appendingPathComponent("link"), withDestinationURL: outside)
+                try fm.setAttributes([.posixPermissions: 0o555], ofItemAtPath: readOnly.path)
+                if !stale { try workspace.clean(); try workspace.clean() }
+            }
+            let next = try PreviewWorkspace(root: cache)
+            let contents = try fm.contentsOfDirectory(atPath: next.folder.path)
+            precondition(contents.isEmpty)
+            try next.clean()
+            let original = try Data(contentsOf: outside)
+            precondition(original == Data("original".utf8))
+            let attributes = try fm.attributesOfItem(atPath: outside.path)
+            precondition((attributes[.posixPermissions] as! NSNumber).intValue == 0o444)
+        }
         let preview = PrivatePreview(root: cache)
         precondition(!fm.fileExists(atPath: cache.appendingPathComponent("session").path))
         let folder = root.appendingPathComponent("文件夹", isDirectory: true)
