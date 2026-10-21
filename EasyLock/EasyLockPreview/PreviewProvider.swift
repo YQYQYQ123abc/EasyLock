@@ -19,34 +19,116 @@ final class PreviewProvider: NSViewController, QLPreviewingController {
 
 final class LockedCardView: NSView {
     var state: LockedPreview.State = .locked
+
+    override var isOpaque: Bool { true }
+
     override func draw(_ dirtyRect: NSRect) {
-        NSColor(red: 0.97, green: 0.97, blue: 0.99, alpha: 1).setFill()
-        bounds.fill()
         guard let context = NSGraphicsContext.current?.cgContext else { return }
+        let dark = effectiveAppearance.bestMatch(from: [.darkAqua, .aqua]) == .darkAqua
+        let paper = dark ? NSColor(srgbRed: 0.035, green: 0.035, blue: 0.039, alpha: 1)
+                         : NSColor(srgbRed: 0.957, green: 0.957, blue: 0.941, alpha: 1)
+        let ink = dark ? NSColor(srgbRed: 0.965, green: 0.965, blue: 0.949, alpha: 1)
+                       : NSColor(srgbRed: 0.063, green: 0.063, blue: 0.071, alpha: 1)
+        let muted = dark ? NSColor(white: 0.64, alpha: 1) : NSColor(white: 0.42, alpha: 1)
+        let faint = dark ? NSColor(white: 0.44, alpha: 1) : NSColor(white: 0.56, alpha: 1)
+
+        NSGradient(starting: dark ? NSColor(white: 0.10, alpha: 1) : NSColor.white,
+                   ending: paper)?.draw(in: bounds, angle: -90)
+
         context.saveGState()
         let scale = min(bounds.width / 640, bounds.height / 440)
         context.translateBy(x: bounds.midX - 320 * scale, y: bounds.midY - 220 * scale)
         context.scaleBy(x: scale, y: scale)
-        let badge = NSBezierPath(roundedRect: NSRect(x: 276, y: 296, width: 88, height: 88), xRadius: 26, yRadius: 26)
-        NSGradient(starting: NSColor(red: 0.36, green: 0.49, blue: 0.91, alpha: 1), ending: NSColor(red: 0.75, green: 0.45, blue: 0.77, alpha: 1))?.draw(in: badge, angle: -45)
-        if state == .locked {
-        NSColor.white.setStroke(); NSColor.white.setFill()
-        let shackle = NSBezierPath(roundedRect: NSRect(x: 306, y: 334, width: 28, height: 29), xRadius: 14, yRadius: 14)
-        shackle.lineWidth = 5; shackle.stroke()
-        NSBezierPath(roundedRect: NSRect(x: 297, y: 313, width: 46, height: 32), xRadius: 7, yRadius: 7).fill()
-        } else {
-            text("!", y: 314, height: 56, size: 40, weight: .semibold, color: .white)
-        }
+
         let messages = LockedPreview.messages(state)
-        text(messages.title, y: 238, size: 28, weight: .semibold, color: .init(white: 0.15, alpha: 1))
-        text(messages.subtitle, y: 188, size: 16, color: .init(white: 0.38, alpha: 1))
-        text(messages.action, y: 116, height: 62, size: 15, color: .init(white: 0.38, alpha: 1))
-        text("EASYLOCK · 本地隐私保护", y: 40, size: 12, weight: .medium, color: .init(red: 0.36, green: 0.44, blue: 0.70, alpha: 1))
+        drawSeal(in: NSRect(x: 266, y: 286, width: 108, height: 120), ink: ink, paper: paper, dark: dark)
+        text(messages.title, y: 238, height: 38, size: 26, weight: .semibold, color: ink)
+        text(messages.subtitle, y: 197, height: 30, size: 15, color: muted)
+        text(messages.action, y: 112, height: 68, size: 13.5, color: muted, lineSpacing: 4)
+        text("EASYLOCK · LOCAL VAULT", y: 52, size: 9.5, weight: .semibold, color: faint, tracking: 2.2)
+
         context.restoreGState()
     }
-    private func text(_ value: String, y: CGFloat, height: CGFloat = 38, size: CGFloat, weight: NSFont.Weight = .regular, color: NSColor) {
-        let style = NSMutableParagraphStyle(); style.alignment = .center
+
+    override func viewDidChangeEffectiveAppearance() {
+        super.viewDidChangeEffectiveAppearance()
+        needsDisplay = true
+    }
+
+    private func drawSeal(in rect: NSRect, ink: NSColor, paper: NSColor, dark: Bool) {
+        NSGraphicsContext.saveGraphicsState()
+        let shadow = NSShadow()
+        shadow.shadowColor = NSColor.black.withAlphaComponent(dark ? 0.5 : 0.16)
+        shadow.shadowBlurRadius = 16
+        shadow.shadowOffset = NSSize(width: 0, height: -6)
+        shadow.set()
+        ink.setFill()
+        shieldPath(in: rect).fill()
+        NSGraphicsContext.restoreGraphicsState()
+
+        let rim = rect.insetBy(dx: rect.width * 0.11, dy: rect.height * 0.10)
+        let rimPath = shieldPath(in: rim)
+        rimPath.lineWidth = 1.3
+        paper.withAlphaComponent(0.45).setStroke()
+        rimPath.stroke()
+
+        if state == .locked {
+            paper.setFill()
+            paper.setStroke()
+            let shackle = NSBezierPath(roundedRect: NSRect(x: rect.midX - 14, y: rect.midY + 2,
+                                                           width: 28, height: 24),
+                                       xRadius: 14, yRadius: 14)
+            shackle.lineWidth = 5
+            shackle.stroke()
+            let body = NSBezierPath(roundedRect: NSRect(x: rect.midX - 22, y: rect.midY - 30,
+                                                        width: 44, height: 36),
+                                    xRadius: 7, yRadius: 7)
+            body.fill()
+            ink.setFill()
+            NSBezierPath(ovalIn: NSRect(x: rect.midX - 3.5, y: rect.midY - 15, width: 7, height: 7)).fill()
+            NSRect(x: rect.midX - 2, y: rect.midY - 23, width: 4, height: 10).fill()
+        } else {
+            paper.setFill()
+            NSBezierPath(roundedRect: NSRect(x: rect.midX - 2.6, y: rect.midY - 2,
+                                             width: 5.2, height: 26),
+                         xRadius: 2.6, yRadius: 2.6).fill()
+            NSBezierPath(ovalIn: NSRect(x: rect.midX - 3.6, y: rect.midY - 18,
+                                        width: 7.2, height: 7.2)).fill()
+        }
+    }
+
+    private func shieldPath(in rect: NSRect) -> NSBezierPath {
+        func point(_ x: CGFloat, _ y: CGFloat) -> NSPoint {
+            NSPoint(x: rect.minX + x * rect.width, y: rect.minY + y * rect.height)
+        }
+        let path = NSBezierPath()
+        path.move(to: point(0.5, 0.988))
+        path.line(to: point(0.148, 0.868))
+        path.curve(to: point(0.064, 0.786),
+                   controlPoint1: point(0.064, 0.857), controlPoint2: point(0.064, 0.857))
+        path.curve(to: point(0.5, 0.012),
+                   controlPoint1: point(0.069, 0.44), controlPoint2: point(0.232, 0.138))
+        path.curve(to: point(0.936, 0.786),
+                   controlPoint1: point(0.768, 0.138), controlPoint2: point(0.931, 0.44))
+        path.curve(to: point(0.852, 0.868),
+                   controlPoint1: point(0.936, 0.857), controlPoint2: point(0.936, 0.857))
+        path.close()
+        return path
+    }
+
+    private func text(_ value: String, y: CGFloat, height: CGFloat = 30, size: CGFloat,
+                      weight: NSFont.Weight = .regular, color: NSColor,
+                      tracking: CGFloat = 0, lineSpacing: CGFloat = 0) {
+        let style = NSMutableParagraphStyle()
+        style.alignment = .center
         style.lineBreakMode = .byWordWrapping
-        (value as NSString).draw(in: NSRect(x: 40, y: y, width: 560, height: height), withAttributes: [.font: NSFont.systemFont(ofSize: size, weight: weight), .foregroundColor: color, .paragraphStyle: style])
+        style.lineSpacing = lineSpacing
+        var attributes: [NSAttributedString.Key: Any] = [
+            .font: NSFont.systemFont(ofSize: size, weight: weight),
+            .foregroundColor: color,
+            .paragraphStyle: style
+        ]
+        if tracking != 0 { attributes[.kern] = tracking }
+        (value as NSString).draw(in: NSRect(x: 34, y: y, width: 572, height: height), withAttributes: attributes)
     }
 }

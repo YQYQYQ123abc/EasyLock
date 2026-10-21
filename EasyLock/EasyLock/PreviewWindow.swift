@@ -35,6 +35,7 @@ struct PreviewWindow: NSViewRepresentable {
         panel.title = Self.displayTitle(title)
         panel.standardWindowButton(.miniaturizeButton)?.isHidden = true
         panel.titlebarAppearsTransparent = true
+        panel.titleVisibility = .hidden
         panel.contentMinSize = NSSize(width: 560, height: 400)
         let host = NSHostingView(rootView: content())
         host.sizingOptions = [] // Content changes must never reposition or resize the window.

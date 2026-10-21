@@ -1,1 +1,1 @@
-{"colors":[{"idiom":"universal","color":{"color-space":"srgb","components":{"red":"0.26","green":"0.36","blue":"0.72","alpha":"1.0"}}}],"info":{"author":"xcode","version":1}}
+{"colors":[{"color":{"color-space":"srgb","components":{"alpha":"1.0","blue":"0.075","green":"0.067","red":"0.067"}},"idiom":"universal"},{"appearances":[{"appearance":"luminosity","value":"dark"}],"color":{"color-space":"srgb","components":{"alpha":"1.0","blue":"0.953","green":"0.965","red":"0.965"}},"idiom":"universal"}],"info":{"author":"xcode","version":1}}

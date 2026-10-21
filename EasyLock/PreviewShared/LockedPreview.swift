@@ -50,23 +50,42 @@ enum LockedPreview {
     }
     static func html(_ state: State) -> Data {
         let (title, subtitle, action) = messages(state)
-        let icon = state == .locked ? "<div class='lock' aria-hidden='true'></div>" : "<div class='unrecognized' aria-hidden='true'>?</div>"
+        let emblem = """
+        <div class="seal" aria-hidden="true"><svg viewBox="0 0 100 110" xmlns="http://www.w3.org/2000/svg">
+        <path d="M50 2 L87 17 C94 20 96 25 95 33 C92 62 76 90 50 106 C24 90 8 62 5 33 C4 25 6 20 13 17 Z" fill="var(--ink)"/>
+        <path d="M50 13 L80 25 C85 27 86 30 85 35 C82 59 69 81 50 94 C31 81 18 59 15 35 C14 30 15 27 20 25 Z" fill="none" stroke="var(--paper)" stroke-opacity=".45" stroke-width="1.6"/>
+        \(state == .locked ? """
+        <path d="M41 53 v-7 a9 9 0 0 1 18 0 v7" fill="none" stroke="var(--paper)" stroke-width="4.6" stroke-linecap="round"/>
+        <rect x="35" y="50" width="30" height="24" rx="6" fill="var(--paper)"/>
+        <circle cx="50" cy="59" r="3.1" fill="var(--ink)"/><path d="M48.2 61 h3.6 v6.5 h-3.6z" fill="var(--ink)"/>
+        """ : """
+        <path d="M50 40 v24" stroke="var(--paper)" stroke-width="5.2" stroke-linecap="round"/>
+        <circle cx="50" cy="76" r="3.4" fill="var(--paper)"/>
+        """)
+        </svg></div>
+        """
         // Only static strings enter this document. No filenames, paths, payload bytes or remote resources.
         return Data("""
         <!doctype html><html lang="zh-CN"><meta charset="utf-8">
         <meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src 'unsafe-inline'">
         <meta name="color-scheme" content="light dark">
         <style>
-        body{margin:0;padding:36px 32px;background:radial-gradient(ellipse at top left,#e9eefc,transparent 65%),radial-gradient(ellipse at bottom right,#f3e3f2,transparent 65%),#f7f8fc;color:#252940;font:15px -apple-system,BlinkMacSystemFont,sans-serif;text-align:center}
-        .lock{position:relative;width:94px;height:94px;margin:25px auto 28px;border-radius:28px;background:linear-gradient(135deg,#5b7fe8,#bf74bd);box-shadow:0 12px 28px #647cce30}
-        .lock:before{content:'';position:absolute;width:26px;height:27px;border:5px solid white;border-radius:18px 18px 0 0;left:29px;top:19px}
-        .lock:after{content:'';position:absolute;left:23px;top:42px;width:48px;height:34px;border-radius:8px;background:radial-gradient(ellipse at center,#7f70c5 0 13%,white 15%)}
-        .unrecognized{margin:25px auto;font-size:64px;color:#8b79b1}
-        h1{font-size:26px;font-weight:600;letter-spacing:-.5px}p{line-height:1.8;margin:12px auto;max-width:440px;color:#70768b}
-        footer{display:inline-block;margin-top:22px;padding:7px 16px;border:1px solid #dce1ef;border-radius:99px;font-size:11px;letter-spacing:2px;color:#68779f}
-        @media(prefers-color-scheme:dark){body{background:radial-gradient(ellipse at top left,#263052,transparent 65%),#171924;color:#eef0ff}p{color:#aeb4cc}footer{border-color:#3b4259;color:#adbce5}}
-        </style>\(icon)
-        <h1>\(title)</h1><p>\(subtitle)</p><p>\(action)</p><footer>EASYLOCK · 本地隐私保护</footer></html>
+        :root{--paper:#f4f4f0;--ink:#101012;--muted:#6a6a6e;--faint:#92928e;--line:#e3e3dc;--halo:#ffffff}
+        @media(prefers-color-scheme:dark){:root{--paper:#09090a;--ink:#f6f6f2;--muted:#a3a3a9;--faint:#6e6e75;--line:#2a2a2e;--halo:#1c1c20}}
+        *{box-sizing:border-box}
+        body{margin:0;min-height:100vh;padding:48px 30px 34px;display:flex;flex-direction:column;align-items:center;justify-content:center;
+          background:radial-gradient(ellipse at 50% 0%,var(--halo) 0%,var(--paper) 62%);color:var(--ink);
+          font:14px/1.65 -apple-system,BlinkMacSystemFont,"SF Pro Text",sans-serif;text-align:center}
+        .seal{width:88px;height:97px;margin-bottom:26px;filter:drop-shadow(0 12px 20px rgba(0,0,0,.16))}
+        .seal svg{width:100%;height:100%;display:block}
+        h1{font-size:25px;line-height:1.3;font-weight:600;letter-spacing:-.4px;margin:0 0 9px}
+        .sub{font-size:14px;color:var(--muted);margin:0 auto 18px;max-width:420px}
+        .action{font-size:13px;line-height:1.9;color:var(--muted);margin:0 auto;max-width:440px;white-space:pre-line}
+        footer{margin-top:28px;padding:6px 14px;border:1px solid var(--line);border-radius:99px;
+          font-size:9.5px;font-weight:600;letter-spacing:1.8px;color:var(--faint)}
+        </style>
+        \(emblem)
+        <h1>\(title)</h1><p class="sub">\(subtitle)</p><p class="action">\(action)</p><footer>EASYLOCK · LOCAL VAULT</footer></html>
         """.utf8)
     }
 }

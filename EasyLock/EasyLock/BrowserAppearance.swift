@@ -4,91 +4,158 @@ import SwiftUI
 struct FileVisualStyle {
     let symbol: String
     let label: String
-    let color: Color
-    let companion: Color
-    let rounded: Bool
+
     static func resolve(name: String, folder: Bool, locked: Bool) -> Self {
-        if folder { return Self(symbol: "folder.fill", label: "FOLDER", color: .blue, companion: .cyan, rounded: false) }
+        if folder { return Self(symbol: "folder", label: "FOLDER") }
         var url = URL(fileURLWithPath: name)
         if locked && url.pathExtension.lowercased() == "easylock" { url.deletePathExtension() }
         switch url.pathExtension.lowercased() {
         case "jpg", "jpeg", "png", "heic", "gif", "webp", "tiff", "svg":
-            return Self(symbol: "photo", label: "IMAGE", color: .teal, companion: .mint, rounded: false)
-        case "pdf": return Self(symbol: "doc.richtext", label: "PDF", color: .pink, companion: .red, rounded: false)
+            return Self(symbol: "photo", label: "IMAGE")
+        case "pdf": return Self(symbol: "doc.richtext", label: "PDF")
         case "xls", "xlsx", "csv", "numbers":
-            return Self(symbol: "tablecells", label: "SHEET", color: .teal, companion: .cyan, rounded: false)
-        case "ppt", "pptx", "key": return Self(symbol: "rectangle.on.rectangle", label: "SLIDES", color: .orange, companion: .pink, rounded: false)
-        case "zip", "rar", "7z", "gz", "tar": return Self(symbol: "doc.zipper", label: "ARCHIVE", color: .orange, companion: .yellow, rounded: false)
-        case "mov", "mp4", "m4v", "mkv": return Self(symbol: "play.rectangle.fill", label: "VIDEO", color: .purple, companion: .pink, rounded: true)
-        case "mp3", "wav", "m4a", "flac", "aac": return Self(symbol: "waveform", label: "AUDIO", color: .indigo, companion: .cyan, rounded: true)
+            return Self(symbol: "tablecells", label: "SHEET")
+        case "ppt", "pptx", "key": return Self(symbol: "rectangle.on.rectangle", label: "SLIDES")
+        case "zip", "rar", "7z", "gz", "tar": return Self(symbol: "doc.zipper", label: "ARCHIVE")
+        case "mov", "mp4", "m4v", "mkv": return Self(symbol: "play.rectangle", label: "VIDEO")
+        case "mp3", "wav", "m4a", "flac", "aac": return Self(symbol: "waveform", label: "AUDIO")
         case "swift", "js", "ts", "py", "json", "html", "css", "rs", "go", "sh":
-            return Self(symbol: "chevron.left.forwardslash.chevron.right", label: "CODE", color: .cyan, companion: .blue, rounded: false)
+            return Self(symbol: "chevron.left.forwardslash.chevron.right", label: "CODE")
         case "doc", "docx", "txt", "md", "rtf", "pages":
-            return Self(symbol: "doc.text", label: "DOC", color: .gray, companion: .blue, rounded: false)
-        default: return Self(symbol: locked ? "lock.doc" : "doc", label: locked ? "LOCKED" : "FILE", color: .gray, companion: .blue, rounded: false)
+            return Self(symbol: "doc.text", label: "DOC")
+        default: return Self(symbol: locked ? "lock.doc" : "doc", label: locked ? "LOCKED" : "FILE")
         }
     }
 }
 
+/// Monochrome file tile that echoes the app icon: paper surface, ink rim,
+/// and a lock seal only when the item is protected.
 struct BrowserFileArtwork: View {
     let name: String
     let folder: Bool
     let locked: Bool
     var unavailable = false
+    var tileSize: CGFloat = 74
+    @Environment(\.colorScheme) private var scheme
+
     private var style: FileVisualStyle { .resolve(name: name, folder: folder, locked: locked) }
+
+    private var tile: LinearGradient {
+        scheme == .dark
+            ? LinearGradient(colors: [Color(red: 0.165, green: 0.165, blue: 0.175),
+                                      Color(red: 0.105, green: 0.105, blue: 0.113)],
+                             startPoint: .topLeading, endPoint: .bottomTrailing)
+            : LinearGradient(colors: [Color.white, Color(red: 0.925, green: 0.925, blue: 0.905)],
+                             startPoint: .topLeading, endPoint: .bottomTrailing)
+    }
+
     var body: some View {
-        ZStack {
-            RoundedRectangle(cornerRadius: 16)
-                .fill(LinearGradient(colors: [style.color.opacity(0.15), style.color.opacity(0.30)], startPoint: .top, endPoint: .bottom))
-                .overlay(RoundedRectangle(cornerRadius: 16).stroke(style.color.opacity(0.18), lineWidth: 1))
-                .frame(width: 72, height: 72)
-                .shadow(color: .black.opacity(0.10), radius: 2, y: 2)
-            Image(systemName: style.symbol).font(.system(size: 34, weight: .regular)).foregroundStyle(style.color)
+        let shape = RoundedRectangle(cornerRadius: tileSize * 0.24, style: .continuous)
+        ZStack(alignment: .bottomTrailing) {
+            shape
+                .fill(tile)
+                .overlay {
+                    shape.strokeBorder(scheme == .dark ? Color.white.opacity(0.07) : Color.black.opacity(0.09), lineWidth: 1)
+                }
+                .overlay {
+                    shape.inset(by: 1)
+                        .strokeBorder(scheme == .dark ? Color.white.opacity(0.035) : Color.white.opacity(0.9), lineWidth: 1)
+                }
+                .shadow(color: .black.opacity(scheme == .dark ? 0.32 : 0.07), radius: 7, y: 3)
+                .frame(width: tileSize, height: tileSize)
+
+            Image(systemName: style.symbol)
+                .font(.system(size: tileSize * 0.38, weight: .light))
+                .foregroundStyle(EasyLockStyle.ink.opacity(locked ? 0.9 : 0.66))
+                .frame(width: tileSize, height: tileSize)
+                .symbolRenderingMode(.monochrome)
+
             if locked || unavailable {
-                Image(systemName: unavailable ? "exclamationmark" : "lock.fill")
-                    .font(.system(size: 10, weight: .semibold)).foregroundStyle(.yellow)
-                    .frame(width: 22, height: 22).background(Color(red: 0.12, green: 0.16, blue: 0.23), in: Circle())
-                    .shadow(color: .black.opacity(0.15), radius: 2, y: 1)
-                    .offset(x: 32, y: 32)
+                seal
+                    .offset(x: 5, y: 5)
             }
-        }.frame(height: 88).frame(maxWidth: .infinity).accessibilityHidden(true)
+        }
+        .frame(height: 92)
+        .frame(maxWidth: .infinity)
+        .accessibilityHidden(true)
+    }
+
+    private var seal: some View {
+        ZStack {
+            Circle()
+                .fill(EasyLockStyle.surface)
+                .frame(width: 26, height: 26)
+            Circle()
+                .fill(unavailable ? EasyLockStyle.warning : EasyLockStyle.ink)
+                .frame(width: 21, height: 21)
+            Image(systemName: unavailable ? "exclamationmark" : "lock.fill")
+                .font(.system(size: 8.5, weight: .bold))
+                .foregroundStyle(unavailable ? Color.white : EasyLockStyle.buttonText)
+        }
+        .shadow(color: .black.opacity(0.20), radius: 3, y: 1)
     }
 }
 
 struct FileStatusPill: View {
     let locked: Bool
     var needsAttention = false
-    private var color: Color { needsAttention ? .orange : locked ? .pink : .teal }
+
+    private var color: Color { needsAttention ? EasyLockStyle.warning : EasyLockStyle.ink }
+    private var label: String { needsAttention ? "需检查" : locked ? "已上锁" : "未加密" }
+    private var symbol: String {
+        needsAttention ? "exclamationmark.triangle.fill" : locked ? "lock.fill" : "lock.open"
+    }
+
     var body: some View {
-        Label(needsAttention ? "需检查" : locked ? "已上锁" : "未加密", systemImage: needsAttention ? "exclamationmark.triangle" : locked ? "lock" : "lock.open")
-            .font(.system(size: 10, weight: .semibold))
-            .foregroundStyle(color).padding(.horizontal, 8).padding(.vertical, 4)
-            .background(color.opacity(0.12), in: Capsule())
+        HStack(spacing: 4) {
+            Image(systemName: symbol).font(.system(size: 8, weight: .bold))
+            Text(label).font(.system(size: 9.5, weight: .semibold)).tracking(0.2)
+        }
+        .foregroundStyle(needsAttention ? color : (locked ? color : EasyLockStyle.secondary))
+        .padding(.horizontal, 8)
+        .padding(.vertical, 4)
+        .background(color.opacity(locked || needsAttention ? 0.07 : 0.04), in: Capsule())
+        .overlay {
+            Capsule().strokeBorder(color.opacity(locked || needsAttention ? 0.22 : 0.16), lineWidth: 1)
+        }
+        .accessibilityLabel(label)
     }
 }
 
 struct FileActionStyle: ButtonStyle {
     @Environment(\.isEnabled) private var enabled
+
     func makeBody(configuration: Configuration) -> some View {
-        configuration.label.font(.system(size: 11, weight: .semibold))
-            .padding(.horizontal, 11).padding(.vertical, 7).foregroundStyle(.white)
-            .background(EasyLockStyle.buttonFill.opacity(configuration.isPressed ? 0.8 : 1), in: RoundedRectangle(cornerRadius: 8))
-            .shadow(color: .black.opacity(0.1), radius: 2, y: 1).opacity(enabled ? 1 : 0.4)
+        let shape = RoundedRectangle(cornerRadius: 8, style: .continuous)
+        configuration.label
+            .font(.system(size: 11, weight: .semibold))
+            .padding(.horizontal, 11)
+            .padding(.vertical, 6)
+            .frame(minHeight: 28)
+            .foregroundStyle(EasyLockStyle.buttonText)
+            .background(EasyLockStyle.buttonFill.opacity(configuration.isPressed ? 0.8 : 1), in: shape)
+            .opacity(enabled ? 1 : 0.38)
     }
 }
 
 struct BrowserCardSurface: ViewModifier {
     let selected: Bool
-    var tint: Color = EasyLockStyle.accent
     @State private var hovering = false
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
+
     func body(content: Content) -> some View {
-        content.padding(16)
+        let shape = RoundedRectangle(cornerRadius: 16, style: .continuous)
+        content
+            .padding(14)
             .background { GlassPanel(radius: 16) }
-            .overlay(RoundedRectangle(cornerRadius: 16).stroke(selected ? EasyLockStyle.accent : .clear, lineWidth: 2))
-            .overlay(RoundedRectangle(cornerRadius: 16).stroke(Color.primary.opacity(hovering ? 0.12 : 0.05), lineWidth: 1))
+            .overlay {
+                shape.strokeBorder(selected ? EasyLockStyle.ink : .clear, lineWidth: 1.6)
+            }
+            .overlay {
+                shape.strokeBorder(hovering && !selected ? EasyLockStyle.ink.opacity(0.16) : .clear, lineWidth: 1)
+            }
             .onHover { hovering = $0 }
-            .animation(reduceMotion ? nil : .easeOut(duration: 0.16), value: hovering)
+            .animation(reduceMotion ? nil : .easeOut(duration: 0.15), value: hovering)
     }
 }
 
@@ -98,21 +165,41 @@ struct BrowserEmptyState: View {
     let detail: String
     let actionTitle: String
     let action: () -> Void
+
     var body: some View {
         ScrollView {
             VStack(spacing: 18) {
-                Image(systemName: symbol)
-                    .font(.system(size: 34, weight: .light)).foregroundStyle(EasyLockStyle.accent)
-                    .frame(width: 86, height: 86)
-                    .background(EasyLockStyle.blue.opacity(0.09), in: RoundedRectangle(cornerRadius: 26))
-                    .overlay(RoundedRectangle(cornerRadius: 26).stroke(EasyLockStyle.blue.opacity(0.12)))
-                VStack(spacing: 9) {
-                    Text(title).font(.title3.weight(.semibold)).foregroundStyle(.primary)
-                    Text(detail).font(.callout).foregroundStyle(.secondary).lineSpacing(4)
+                ZStack(alignment: .bottomTrailing) {
+                    BrandMark(size: 82)
+                    Image(systemName: symbol)
+                        .font(.system(size: 11, weight: .semibold))
+                        .foregroundStyle(EasyLockStyle.buttonText)
+                        .frame(width: 27, height: 27)
+                        .background(EasyLockStyle.ink, in: Circle())
+                        .overlay { Circle().strokeBorder(EasyLockStyle.surface, lineWidth: 2) }
+                        .offset(x: 3, y: 3)
+                }
+                .padding(.bottom, 4)
+
+                VStack(spacing: 8) {
+                    Text(title)
+                        .font(.system(size: 17, weight: .semibold))
+                        .foregroundStyle(EasyLockStyle.ink)
+                    Text(detail)
+                        .font(.system(size: 12))
+                        .foregroundStyle(.secondary)
+                        .lineSpacing(4)
                         .fixedSize(horizontal: false, vertical: true)
-                }.multilineTextAlignment(.center)
-                Button(actionTitle, action: action).buttonStyle(BrandPrimaryButtonStyle()).padding(.top, 4)
-            }.frame(maxWidth: 420).padding(32).frame(maxWidth: .infinity)
+                }
+                .multilineTextAlignment(.center)
+
+                Button(actionTitle, action: action)
+                    .buttonStyle(BrandPrimaryButtonStyle())
+                    .padding(.top, 2)
+            }
+            .frame(maxWidth: 420)
+            .padding(32)
+            .frame(maxWidth: .infinity)
         }
         .defaultScrollAnchor(.center)
         .frame(maxWidth: .infinity, maxHeight: .infinity)

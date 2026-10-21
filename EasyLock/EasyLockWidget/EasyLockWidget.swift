@@ -16,34 +16,116 @@ struct Provider: TimelineProvider {
         return Entry(date: .now, count: summary.count, updated: summary.updated)
     }
 }
+
+private struct WidgetShield: View {
+    var size: CGFloat = 34
+    var body: some View {
+        ZStack {
+            Image(systemName: "shield.fill")
+                .font(.system(size: size, weight: .regular))
+                .foregroundStyle(.white)
+            Image(systemName: "lock.fill")
+                .font(.system(size: size * 0.34, weight: .bold))
+                .foregroundStyle(.black.opacity(0.88))
+                .offset(y: size * 0.03)
+        }
+        .frame(width: size * 0.86, height: size)
+    }
+}
+
 struct WidgetContent: View {
     let entry: Entry
     @Environment(\.widgetFamily) private var family
+
     var body: some View {
-        HStack(spacing: 24) {
+        HStack(spacing: 18) {
             VStack(alignment: .leading, spacing: 9) {
-                Label("EasyLock", systemImage: "heart.circle").font(.headline)
-                Spacer(minLength: 4)
-                if let count = entry.count {
-                    Text("\(count)").font(.system(size: 32, weight: .semibold, design: .rounded))
-                    Text("保险箱记录").font(.caption).foregroundStyle(.secondary)
-                    if let updated = entry.updated { Text(updated, style: .time).font(.caption2).foregroundStyle(.secondary) }
-                } else {
-                    Text("你的隐私\n由你掌握").font(.title3.weight(.medium))
-                    Text("打开保险箱").font(.caption).foregroundStyle(.secondary)
+                HStack(spacing: 8) {
+                    WidgetShield(size: 27)
+                    Text("EasyLock")
+                        .font(.system(size: 13, weight: .semibold))
+                        .foregroundStyle(.white)
+                        .tracking(0.1)
                 }
-            }.frame(maxWidth: .infinity, alignment: .leading)
-            if family == .systemMedium {
-                VStack(alignment: .leading, spacing: 15) {
-                    Link(destination: URL(string: "easylock://add-file")!) { Label("添加文件", systemImage: "doc.badge.plus") }
-                    Link(destination: URL(string: "easylock://add-folder")!) { Label("添加文件夹", systemImage: "folder.badge.plus") }
-                    Link(destination: URL(string: "easylock://settings")!) { Label("安全设置", systemImage: "slider.horizontal.3") }
-                }.font(.callout)
+
+                Spacer(minLength: 2)
+
+                if let count = entry.count {
+                    HStack(alignment: .firstTextBaseline, spacing: 5) {
+                        Text("\(count)")
+                            .font(.system(size: 34, weight: .semibold))
+                            .monospacedDigit()
+                            .foregroundStyle(.white)
+                        Text("项")
+                            .font(.system(size: 11, weight: .medium))
+                            .foregroundStyle(.white.opacity(0.45))
+                    }
+                    Text("保险箱记录")
+                        .font(.system(size: 10))
+                        .foregroundStyle(.white.opacity(0.55))
+                    if let updated = entry.updated {
+                        Text(updated, style: .time)
+                            .font(.system(size: 9))
+                            .foregroundStyle(.white.opacity(0.32))
+                    }
+                } else {
+                    Text("你的文件\n由你上锁")
+                        .font(.system(size: 16, weight: .medium))
+                        .foregroundStyle(.white)
+                        .lineSpacing(2)
+                    Text("打开 EasyLock")
+                        .font(.system(size: 9.5))
+                        .foregroundStyle(.white.opacity(0.5))
+                }
             }
-        }.widgetURL(URL(string: "easylock://library"))
-        .containerBackground(for: .widget) { LinearGradient(colors: [Color(red: 0.34, green: 0.47, blue: 0.84).opacity(0.08), Color(red: 0.76, green: 0.43, blue: 0.70).opacity(0.12)], startPoint: .topLeading, endPoint: .bottomTrailing) }
+            .frame(maxWidth: .infinity, alignment: .leading)
+
+            if family == .systemMedium {
+                VStack(alignment: .leading, spacing: 12) {
+                    widgetLink("添加文件", symbol: "doc.badge.plus", url: "easylock://add-file")
+                    widgetLink("添加文件夹", symbol: "folder.badge.plus", url: "easylock://add-folder")
+                    widgetLink("安全设置", symbol: "slider.horizontal.3", url: "easylock://settings")
+                }
+                .font(.system(size: 11, weight: .medium))
+                .frame(maxWidth: .infinity, alignment: .leading)
+            }
+        }
+        .widgetURL(URL(string: "easylock://library"))
+        .containerBackground(for: .widget) {
+            ZStack {
+                Color(red: 0.043, green: 0.043, blue: 0.049)
+                RadialGradient(colors: [Color.white.opacity(0.115), .clear],
+                               center: .topLeading, startRadius: 4, endRadius: 260)
+                LinearGradient(colors: [.clear, Color.black.opacity(0.30)],
+                               startPoint: .center, endPoint: .bottom)
+            }
+        }
+    }
+
+    private func widgetLink(_ title: String, symbol: String, url: String) -> some View {
+        Link(destination: URL(string: url)!) {
+            HStack(spacing: 8) {
+                Image(systemName: symbol)
+                    .font(.system(size: 10, weight: .semibold))
+                    .frame(width: 16)
+                Text(title)
+                Spacer(minLength: 0)
+                Image(systemName: "arrow.up.right")
+                    .font(.system(size: 7, weight: .bold))
+                    .foregroundStyle(.white.opacity(0.28))
+            }
+            .foregroundStyle(.white.opacity(0.78))
+            .padding(.horizontal, 9)
+            .padding(.vertical, 7)
+            .background(Color.white.opacity(0.065), in: RoundedRectangle(cornerRadius: 7, style: .continuous))
+            .overlay {
+                RoundedRectangle(cornerRadius: 7, style: .continuous)
+                    .strokeBorder(Color.white.opacity(0.08), lineWidth: 1)
+            }
+        }
     }
 }
+
 @main struct EasyLockWidget: Widget {
     var body: some WidgetConfiguration {
         StaticConfiguration(kind: "EasyLockQuickAccess", provider: Provider()) { WidgetContent(entry: $0) }

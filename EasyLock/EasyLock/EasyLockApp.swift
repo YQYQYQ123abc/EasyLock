@@ -8,9 +8,9 @@ struct EasyLockApp: App {
         Window("EasyLock", id: "main") {
             ContentView(store: store)
                 .modifier(MainWindowRegistration(delegate: appDelegate, preview: store.preview))
-
         }
         .defaultSize(width: 1060, height: 720)
+        .windowToolbarStyle(.unified(showsTitle: false))
         .commands {
             CommandGroup(replacing: .newItem) {
                 Button("添加文件…") { store.chooseSources() }
