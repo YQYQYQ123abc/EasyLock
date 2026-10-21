@@ -1,1 +1,263 @@
-<!doctype html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="description" content="EasyLock：免费、离线的 macOS 文件加密工具。查看最新测试版本、隐私说明与使用支持。"><title>本地保护，轻松恢复 · EasyLock</title><link rel="icon" href="icon.png"><link rel="stylesheet" href="style.css"></head><body><header><a class="brand" href="index.html"><img src="icon.png" alt="">EasyLock</a><nav aria-label="主导航"><a href="privacy.html">隐私</a><a href="support.html">支持</a><a href="https://github.com/YQYQYQ123abc/EasyLock">GitHub</a></nav></header><main><section class="hero"><span class="eyebrow">FREE · OFFLINE · MACOS</span><h1>你的文件，<br>留在你的 Mac。</h1><p class="lead">EasyLock 将文件与文件夹加密为 .easylock 文件。无需账号、无需激活，在本机完成保护与恢复。</p><div class="actions"><a class="button primary" href="https://github.com/YQYQYQ123abc/EasyLock/releases">查看最新测试版</a><a class="button" href="support.html">先阅读使用说明</a></div></section><p class="note"><strong>当前是开发预览版。</strong>尚未完成正式公证、独立安全审查与完整实机验收。测试包使用开发签名，请仅使用有独立备份的测试资料。</p><h2>从添加，到恢复</h2><ol class="steps"><li><strong>添加文件或文件夹。</strong>拖入应用，或从添加窗口选择，确认后在原位置生成密文。</li><li><strong>Finder 显示锁定提示。</strong>在 EasyLock 内验证身份后可临时预览内容；关闭后清理应用临时副本，系统预览可能保留缓存。</li><li><strong>用对应凭据恢复。</strong>使用加密密码，或加密时已启用的恢复密钥。启用 Touch ID 后优先使用本机指纹验证，也可使用对应密码或恢复密钥。</li></ol><h2>使用前需要知道</h2><p>更改主密码不会为已有文件更换密码；开发者无法找回遗失的密码或恢复密钥。加密不会清除历史备份、快照和其他明文副本。当前不提供应用程序加密。</p><p>支持 Intel 与 Apple Silicon 双架构构建，最低 macOS 14。实际兼容性仍在测试中。</p></main><footer>EasyLock · 免费离线应用 · macOS 14 及以上<br>应用不联网；网站由 GitHub Pages 托管，访问网站适用 GitHub 的隐私政策。<a href="https://docs.github.com/en/site-policy/privacy-policies/github-general-privacy-statement">了解网站托管隐私</a></footer></body></html>
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="description" content="EasyLock：免费、离线的 macOS 文件加密工具。新的黑白界面、Quick Look、Finder 缩略图和桌面小组件。">
+  <title>EasyLock · 你的文件，留在你的 Mac</title>
+  <link rel="icon" href="icon.png">
+  <link rel="apple-touch-icon" href="icon.png">
+  <meta name="theme-color" content="#f4f4f0" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#09090a" media="(prefers-color-scheme: dark)">
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="EasyLock · 你的文件，留在你的 Mac">
+  <meta property="og:description" content="免费、离线的 macOS 文件加密工具。新的黑白界面、Quick Look、Finder 缩略图和桌面小组件。">
+  <meta property="og:image" content="https://yqyqyq123abc.github.io/EasyLock/screens/library.jpg">
+  <meta property="og:url" content="https://yqyqyq123abc.github.io/EasyLock/">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <a class="skip-link" href="#main">跳到主要内容</a>
+
+  <header class="site-header">
+    <div class="wrap header-inner">
+      <a class="brand" href="index.html" aria-label="EasyLock 首页">
+        <img src="icon.png" width="42" height="42" alt="">
+        <span>
+          <span class="brand-name">EasyLock</span>
+          <span class="brand-sub">LOCAL VAULT</span>
+        </span>
+      </a>
+      <nav class="nav" aria-label="主导航">
+        <a class="nav-optional" href="#features">功能</a>
+        <a class="nav-optional" href="#screens">界面</a>
+        <a href="privacy.html">隐私</a>
+        <a href="support.html">支持</a>
+        <a class="nav-github" href="https://github.com/YQYQYQ123abc/EasyLock" target="_blank" rel="noopener">
+          GitHub
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 4h6v6"/><path d="M20 4l-9 9"/><path d="M19 14v5a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V6a1 1 0 0 1 1-1h5"/></svg>
+        </a>
+      </nav>
+    </div>
+  </header>
+
+  <main id="main" class="wrap">
+    <section class="hero">
+      <div class="hero-copy">
+        <p class="eyebrow"><span class="eyebrow-dot"></span>FREE · OFFLINE · MACOS 14+</p>
+        <h1>你的文件，<br><span>留在你的 Mac。</span></h1>
+        <p class="lead">EasyLock 在本机把文件和文件夹加密为 <code>.easylock</code>。没有账号、激活或云上传，解密凭据只属于你。</p>
+        <div class="actions">
+          <a class="button primary" href="https://github.com/YQYQYQ123abc/EasyLock/releases">
+            下载最新测试版
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v12"/><path d="M7 10l5 5 5-5"/><path d="M4 20h16"/></svg>
+          </a>
+          <a class="button" href="https://github.com/YQYQYQ123abc/EasyLock" target="_blank" rel="noopener">查看源码</a>
+        </div>
+        <div class="hero-meta">
+          <span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3l6.5 2.8V11c0 4.1-2.7 7.2-6.5 8.7C8.2 18.2 5.5 15.1 5.5 11V5.8z"/><path d="M9.2 11.6l2 2 3.7-4.1"/></svg>AES-256-GCM</span>
+          <i class="dot" aria-hidden="true"></i>
+          <span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3.5" y="4.5" width="17" height="12" rx="2"/><path d="M8 20h8"/><path d="M12 16.5V20"/></svg>本机处理</span>
+          <i class="dot" aria-hidden="true"></i>
+          <span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="8" r="3"/><path d="M5.5 20a6.5 6.5 0 0 1 13 0"/><path d="M4 4l16 16"/></svg>无需账号</span>
+        </div>
+      </div>
+      <div class="hero-visual">
+        <div class="window">
+          <picture>
+            <source srcset="screens/welcome-dark.jpg" media="(prefers-color-scheme: dark)">
+            <img src="screens/welcome.jpg" width="1600" height="1086" alt="EasyLock 新版的欢迎与解锁界面，使用黑白盾牌图标" fetchpriority="high">
+          </picture>
+        </div>
+      </div>
+    </section>
+
+    <p class="notice">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3.8l8.2 14.4a1.2 1.2 0 0 1-1 1.8H4.8a1.2 1.2 0 0 1-1-1.8z"/><path d="M12 9v4.5"/><path d="M12 16.8h.01"/></svg>
+      <span><strong>当前为开发预览版。</strong> GitHub Releases 提供的是 <strong>0.8.2 Preview 2 · 构建 31</strong>，使用开发签名，尚未完成公证和独立安全审查。新的黑白界面已合并到 <a href="https://github.com/YQYQYQ123abc/EasyLock/tree/main" target="_blank" rel="noopener">main 分支</a>；下一次测试包更新前，下载版界面可能不同。请仅使用有独立备份的测试资料。</span>
+    </p>
+
+    <section class="section" id="features">
+      <div class="section-head">
+        <div>
+          <p class="section-kicker">WHY EASYLOCK</p>
+          <h2 class="section-title">保护文件，<br>不需要把文件交出去。</h2>
+        </div>
+        <p class="section-copy">加密、预览和恢复都在本机完成。界面换成更安静的黑白设计，操作路径仍然直接。</p>
+      </div>
+
+      <div class="grid-3">
+        <article class="card">
+          <div class="icon-tile">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6.5 3.5h7l4 4v13h-11z"/><path d="M13.5 3.5v4h4"/><rect x="8.5" y="12" width="7" height="5.5" rx="1.2"/><path d="M10.2 12v-1.4a1.8 1.8 0 0 1 3.6 0V12"/></svg>
+          </div>
+          <h3>原地加密</h3>
+          <p>文件留在原来的位置，名称后追加 <code>.easylock</code>。支持多选与拖放，确认后直接在本机完成替换和校验。</p>
+          <div class="pill-row"><span class="pill">.EASYLOCK</span><span class="pill">拖放 / 多选</span></div>
+        </article>
+
+        <article class="card">
+          <div class="icon-tile">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3l7 3v5c0 4.3-2.9 7.6-7 9-4.1-1.4-7-4.7-7-9V6z"/><path d="M9 11.2s1.2-1.7 3-1.7 3 1.7 3 1.7-1.2 1.7-3 1.7-3-1.7-3-1.7z"/><circle cx="12" cy="11.2" r=".8" fill="currentColor" stroke="none"/></svg>
+          </div>
+          <h3>验证后预览</h3>
+          <p>用文件密码、恢复密钥或 Touch ID 验证后临时查看。关闭或锁定应用时清理应用临时副本，原密文不被修改。</p>
+          <div class="pill-row"><span class="pill">TOUCH ID</span><span class="pill">恢复密钥</span></div>
+        </article>
+
+        <article class="card">
+          <div class="icon-tile">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3.5" y="4.5" width="17" height="12" rx="2"/><path d="M8 20h8"/><path d="M12 16.5V20"/><path d="M3 3l18 18"/></svg>
+          </div>
+          <h3>真正离线</h3>
+          <p>没有账号、激活、广告和遥测，也没有内置联网更新。应用只在你授权的目录里读写你的文件。</p>
+          <div class="pill-row"><span class="pill">NO ACCOUNT</span><span class="pill">NO TELEMETRY</span></div>
+        </article>
+      </div>
+
+      <ul class="spec-strip" aria-label="产品规格">
+        <li><strong>AES-256-GCM</strong><span>加密</span></li>
+        <li><strong>macOS 14+</strong><span>系统要求</span></li>
+        <li><strong>arm64 + x86_64</strong><span>架构</span></li>
+        <li><strong>0</strong><span>账号与激活</span></li>
+      </ul>
+    </section>
+
+    <section class="section" id="how">
+      <div class="section-head">
+        <div>
+          <p class="section-kicker">HOW IT WORKS</p>
+          <h2 class="section-title">从添加，到恢复，<br>只有三步。</h2>
+        </div>
+        <p class="section-copy">不需要搬动文件，也不需要注册。每一步都留在你的 Mac 上。</p>
+      </div>
+      <div class="steps">
+        <article class="step">
+          <div class="step-num">1</div>
+          <h3>添加并加密</h3>
+          <p>拖入文件或文件夹，确认加密。原件通过校验后才会被替换，原位置只留下密文。</p>
+        </article>
+        <article class="step">
+          <div class="step-num">2</div>
+          <h3>验证后查看</h3>
+          <p>双击密文或拖回应用，用密码、恢复密钥或 Touch ID 验证；也可以先解密到其他位置保留密文。</p>
+        </article>
+        <article class="step">
+          <div class="step-num">3</div>
+          <h3>保存你的凭据</h3>
+          <p>建议启用恢复密钥并单独保存。更改主密码不会为旧文件换密码，开发者也无法找回遗失的凭据。</p>
+        </article>
+      </div>
+      <p class="section-note">加密不会清除历史缓存、备份、快照或其他明文副本。操作前请保留独立备份，并关闭正在编辑这些文件的程序。</p>
+    </section>
+
+    <section class="section" id="screens">
+      <div class="section-head">
+        <div>
+          <p class="section-kicker">THE NEW INTERFACE</p>
+          <h2 class="section-title">纸张、墨色，<br>和一把锁。</h2>
+        </div>
+        <p class="section-copy">新界面从应用图标出发：黑白盾牌、同心描边、克制的留白。颜色只留给需要你注意的警告。</p>
+      </div>
+
+      <div class="gallery">
+        <figure class="figure">
+          <div class="window">
+            <img src="screens/welcome.jpg" width="1600" height="1086" alt="EasyLock 欢迎与解锁页面的新界面" loading="lazy" decoding="async">
+          </div>
+          <figcaption><strong>欢迎与解锁</strong><span class="tag">LIGHT</span></figcaption>
+        </figure>
+        <figure class="figure">
+          <div class="window">
+            <img src="screens/library.jpg" width="1600" height="1086" alt="EasyLock 加密文件页面的新界面，显示黑白文件卡片" loading="lazy" decoding="async">
+          </div>
+          <figcaption><strong>加密文件</strong><span class="tag">LIGHT</span></figcaption>
+        </figure>
+        <figure class="figure">
+          <div class="window">
+            <img src="screens/about.jpg" width="1600" height="1086" alt="EasyLock 关于页面与版本信息" loading="lazy" decoding="async">
+          </div>
+          <figcaption><strong>关于与版本</strong><span class="tag">LIGHT</span></figcaption>
+        </figure>
+        <figure class="figure">
+          <div class="window">
+            <img src="screens/welcome-dark.jpg" width="1600" height="1086" alt="EasyLock 深色模式下的欢迎与解锁页面" loading="lazy" decoding="async">
+          </div>
+          <figcaption><strong>深色模式</strong><span class="tag">DARK</span></figcaption>
+        </figure>
+      </div>
+
+      <p class="section-note">截图来自 <code>main</code> 分支的新界面，使用演示数据。GitHub Releases 中的当前测试包可能仍是旧界面，下载前请注意版本说明。</p>
+    </section>
+
+    <section class="section" id="system">
+      <div class="section-head">
+        <div>
+          <p class="section-kicker">SYSTEM INTEGRATION</p>
+          <h2 class="section-title">在 Finder 里，<br>也一样安静。</h2>
+        </div>
+        <p class="section-copy">锁定缩略图、Quick Look 预览和桌面小组件沿用同一套黑白语言。它们只显示锁定状态和数量，不读取明文。</p>
+      </div>
+
+      <div class="system">
+        <div class="system-copy">
+          <div>
+            <h3>Quick Look 与 Finder 缩略图</h3>
+            <p>Finder 预览和缩略图只检查密文标识并显示固定提示，不解密文件内容。桌面小组件默认隐藏记录数量，不共享文件名、路径或密码。</p>
+          </div>
+          <a class="text-link" href="privacy.html#preview">了解预览与隐私 →</a>
+        </div>
+        <div class="asset-grid">
+          <div class="asset">
+            <picture>
+              <source srcset="screens/quicklook-dark.png" media="(prefers-color-scheme: dark)">
+              <img src="screens/quicklook.png" width="640" height="440" alt="EasyLock 锁定文件的 Quick Look 预览卡片" loading="lazy" decoding="async">
+            </picture>
+            <span>QUICK LOOK</span>
+          </div>
+          <div class="asset">
+            <img src="screens/thumbnail.png" width="512" height="512" alt="EasyLock 锁定文件的 Finder 缩略图" loading="lazy" decoding="async">
+            <span>FINDER THUMBNAIL</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="download">
+      <div class="download">
+        <div class="download-copy">
+          <p class="section-kicker">DOWNLOAD</p>
+          <h2>准备好试试了吗？</h2>
+          <p>从 GitHub Releases 获取最新测试版。当前发布包为 0.8.2 Preview 2 · 构建 31；新的黑白界面已合并到 main，下一次打包后会更新下载包。</p>
+          <p class="download-note">当前包使用开发签名，尚未完成公证和完整实机验收。请只使用有独立备份的测试文件；正式版发布前不建议处理唯一副本。</p>
+          <span class="download-status">DEVELOPMENT PREVIEW</span>
+        </div>
+        <div class="download-actions">
+          <a class="button primary" href="https://github.com/YQYQYQ123abc/EasyLock/releases">
+            下载最新测试版
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v12"/><path d="M7 10l5 5 5-5"/><path d="M4 20h16"/></svg>
+          </a>
+          <a class="button" href="https://github.com/YQYQYQ123abc/EasyLock#构建与验证" target="_blank" rel="noopener">从源码构建</a>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="wrap">
+      <div class="footer-inner">
+        <div>
+          <a class="footer-brand" href="index.html"><img src="icon.png" width="26" height="26" alt="">EasyLock</a>
+          <p class="footer-note">免费离线应用 · macOS 14 及以上<br>应用不联网；网站由 GitHub Pages 托管，访问网站适用 GitHub 的隐私政策。<a href="https://docs.github.com/en/site-policy/privacy-policies/github-general-privacy-statement" target="_blank" rel="noopener">了解网站托管隐私</a></p>
+        </div>
+        <div class="footer-links">
+          <a href="privacy.html">隐私</a>
+          <a href="support.html">支持</a>
+          <a href="https://github.com/YQYQYQ123abc/EasyLock/blob/main/EasyLock/Distribution/ReleaseNotes/0.8.2-preview.2.md" target="_blank" rel="noopener">发布说明</a>
+          <a href="https://github.com/YQYQYQ123abc/EasyLock" target="_blank" rel="noopener">GitHub</a>
+        </div>
+      </div>
+    </div>
+  </footer>
+</body>
+</html>

@@ -1,1 +1,140 @@
-<!doctype html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="description" content="EasyLock：免费、离线的 macOS 文件加密工具。查看测试版本、隐私说明与使用支持。"><title>使用与支持 · EasyLock</title><link rel="icon" href="icon.png"><link rel="stylesheet" href="style.css"></head><body><header><a class="brand" href="index.html"><img src="icon.png" alt="">EasyLock</a><nav aria-label="主导航"><a href="privacy.html">隐私</a><a href="support.html">支持</a><a href="https://github.com/YQYQYQ123abc/EasyLock">GitHub</a></nav></header><main><span class="eyebrow">HELP & SUPPORT</span><h1>保护之前，先做好备份。</h1><p class="lead">遇到问题时，保留原始文件、密文和待恢复记录，避免反复替换或手动清理。</p><h2>如何开始</h2><p>设置主密码后，添加或拖入文件。首次操作可能需要授权所在文件夹。加密成功后名称增加 .easylock；双击密文或拖回应用进入解密流程。</p><h2>忘记密码怎么办？</h2><p>如果该文件在加密时已启用恢复密钥，可以用对应密钥恢复。否则开发者无法代为解密。Touch ID 不能替代异机恢复所需的密码或密钥。</p><h2>打不开测试包怎么办？</h2><p>当前包尚未完成 Developer ID 公证，其他 Mac 可能无法直接运行。请等待公证版本，或从源码在 Xcode 中构建。不要为了测试关闭系统安全保护。</p><h2>改了文件后缀怎么办？</h2><p>改后缀不会解密。将文件拖回 EasyLock，应用会检查密文标识；系统可能不会再默认用 EasyLock 打开它。</p><h2>操作中断或恢复失败</h2><p>重新打开应用，检查安全与设置中的恢复任务。先保存错误提示，不要手动删除事务目录。测试数据应始终有另外的备份。</p><h2>反馈问题</h2><p>请提供应用版本、macOS 版本、芯片类型、复现步骤及去除私人信息的错误提示。不要公开密码、恢复密钥、私人文件或完整私人路径。</p><div class="actions"><a class="button primary" href="https://github.com/YQYQYQ123abc/EasyLock/issues/new">提交问题</a><a class="button" href="https://github.com/YQYQYQ123abc/EasyLock/blob/main/EasyLock/Distribution/Testing-Guide.md">测试验收步骤</a></div><p>Issues 是公开反馈渠道，不适合提交敏感资料。对于潜在安全问题，请先仅描述问题类型，请求维护者提供私下沟通方式。</p></main><footer>EasyLock · 免费离线应用 · macOS 14 及以上<br>应用不联网；网站由 GitHub Pages 托管，访问网站适用 GitHub 的隐私政策。<a href="https://docs.github.com/en/site-policy/privacy-policies/github-general-privacy-statement">了解网站托管隐私</a></footer></body></html>
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="description" content="EasyLock 使用与支持：安装、解密、忘记密码、后缀变化、操作中断恢复和问题反馈。">
+  <title>使用与支持 · EasyLock</title>
+  <link rel="icon" href="icon.png">
+  <link rel="apple-touch-icon" href="icon.png">
+  <meta name="theme-color" content="#f4f4f0" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#09090a" media="(prefers-color-scheme: dark)">
+  <meta property="og:type" content="article">
+  <meta property="og:title" content="使用与支持 · EasyLock">
+  <meta property="og:description" content="安装、解密、忘记密码、后缀变化、操作中断恢复和问题反馈。">
+  <meta property="og:image" content="https://yqyqyq123abc.github.io/EasyLock/screens/library.jpg">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <a class="skip-link" href="#main">跳到主要内容</a>
+
+  <header class="site-header">
+    <div class="wrap header-inner">
+      <a class="brand" href="index.html" aria-label="EasyLock 首页">
+        <img src="icon.png" width="42" height="42" alt="">
+        <span>
+          <span class="brand-name">EasyLock</span>
+          <span class="brand-sub">LOCAL VAULT</span>
+        </span>
+      </a>
+      <nav class="nav" aria-label="主导航">
+        <a class="nav-optional" href="index.html#features">功能</a>
+        <a class="nav-optional" href="index.html#screens">界面</a>
+        <a href="privacy.html">隐私</a>
+        <a href="support.html" aria-current="page">支持</a>
+        <a class="nav-github" href="https://github.com/YQYQYQ123abc/EasyLock" target="_blank" rel="noopener">
+          GitHub
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 4h6v6"/><path d="M20 4l-9 9"/><path d="M19 14v5a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V6a1 1 0 0 1 1-1h5"/></svg>
+        </a>
+      </nav>
+    </div>
+  </header>
+
+  <main id="main" class="wrap">
+    <section class="page-hero">
+      <p class="eyebrow"><span class="eyebrow-dot"></span>HELP &amp; SUPPORT</p>
+      <h1>保护之前，<br>先做好备份。</h1>
+      <p class="lead">遇到问题时，保留原始文件、密文和待恢复记录，避免反复替换或手动清理。下面是最常见的使用与恢复问题。</p>
+    </section>
+
+    <div class="docs-layout">
+      <nav class="docs-nav" aria-label="本页内容">
+        <p class="docs-nav-title">本页内容</p>
+        <a href="#start">开始使用</a>
+        <a href="#password">忘记密码</a>
+        <a href="#open">打不开测试包</a>
+        <a href="#rename">后缀变化</a>
+        <a href="#recovery">中断与恢复</a>
+        <a href="#feedback">反馈问题</a>
+      </nav>
+
+      <div class="docs-content">
+        <div class="meta-strip">
+          <span><strong>当前发布包</strong> 0.8.2 Preview 2 · 构建 31</span>
+          <span>开发签名 · 尚未公证</span>
+          <span>macOS 14 及以上</span>
+        </div>
+
+        <div class="support-grid">
+          <div class="support-card">
+            <h2>新的黑白界面</h2>
+            <p>新界面已经合并到 main 分支。GitHub Releases 中的当前测试包仍是旧界面，下一次打包后会更新下载包。</p>
+            <span class="pill">MAIN BRANCH</span>
+          </div>
+          <div class="support-card">
+            <h2>开始之前</h2>
+            <p>只使用有独立备份的测试文件。正式公证、独立安全审查和完整实机验收尚未完成。</p>
+            <span class="pill">DEVELOPMENT PREVIEW</span>
+          </div>
+        </div>
+
+        <section class="docs-section" id="start">
+          <h2>如何开始</h2>
+          <p>设置主密码后，添加或拖入文件。首次操作可能需要授权所在文件夹。加密成功后名称增加 <code>.easylock</code>；双击密文或拖回应用进入解密流程。</p>
+          <p>建议先用一份可丢弃的测试文件完整走一遍：加密 → 检查密文 → 解密到其他位置 → 对比内容。</p>
+        </section>
+
+        <section class="docs-section" id="password">
+          <h2>忘记密码怎么办？</h2>
+          <p>如果该文件在加密时已启用恢复密钥，可以用对应密钥恢复。否则开发者无法代为解密。Touch ID 不能替代异机恢复所需的密码或密钥。</p>
+          <p>更改主密码不会给已有文件换密码；旧文件仍需原密码，或加密时已启用的恢复密钥。</p>
+        </section>
+
+        <section class="docs-section" id="open">
+          <h2>打不开测试包怎么办？</h2>
+          <p>当前包尚未完成 Developer ID 公证，其他 Mac 可能无法直接运行。请等待公证版本，或从源码在 Xcode 中构建。不要为了测试关闭系统安全保护。</p>
+        </section>
+
+        <section class="docs-section" id="rename">
+          <h2>改了文件后缀怎么办？</h2>
+          <p>改后缀不会解密。将文件拖回 EasyLock，应用会检查密文标识；系统可能不会再默认用 EasyLock 打开它。</p>
+        </section>
+
+        <section class="docs-section" id="recovery">
+          <h2>操作中断或恢复失败</h2>
+          <p>重新打开应用，检查“安全与解锁”中的恢复任务。先保存错误提示，不要手动删除事务目录。测试数据应始终有另外的备份。</p>
+          <p>如果磁盘已满、外置盘被拔出或应用被强制退出，先让原文件所在位置保持可访问，再重新打开 EasyLock 检查未完成任务。</p>
+        </section>
+
+        <section class="docs-section" id="feedback">
+          <h2>反馈问题</h2>
+          <p>请提供应用版本、macOS 版本、芯片类型、复现步骤及去除私人信息的错误提示。不要公开密码、恢复密钥、私人文件或完整私人路径。</p>
+          <p>Issues 是公开反馈渠道，不适合提交敏感资料。对于潜在安全问题，请先仅描述问题类型，请求维护者提供私下沟通方式。</p>
+          <div class="inline-actions">
+            <a class="button primary" href="https://github.com/YQYQYQ123abc/EasyLock/issues/new" target="_blank" rel="noopener">提交问题</a>
+            <a class="button" href="https://github.com/YQYQYQ123abc/EasyLock/blob/main/EasyLock/Distribution/Testing-Guide.md" target="_blank" rel="noopener">测试验收步骤</a>
+            <a class="button" href="https://github.com/YQYQYQ123abc/EasyLock/blob/main/EasyLock/Distribution/ReleaseNotes/0.8.2-preview.2.md" target="_blank" rel="noopener">发布说明</a>
+          </div>
+        </section>
+      </div>
+    </div>
+  </main>
+
+  <footer class="site-footer">
+    <div class="wrap">
+      <div class="footer-inner">
+        <div>
+          <a class="footer-brand" href="index.html"><img src="icon.png" width="26" height="26" alt="">EasyLock</a>
+          <p class="footer-note">免费离线应用 · macOS 14 及以上<br>应用不联网；网站由 GitHub Pages 托管，访问网站适用 GitHub 的隐私政策。<a href="https://docs.github.com/en/site-policy/privacy-policies/github-general-privacy-statement" target="_blank" rel="noopener">了解网站托管隐私</a></p>
+        </div>
+        <div class="footer-links">
+          <a href="privacy.html">隐私</a>
+          <a href="support.html">支持</a>
+          <a href="https://github.com/YQYQYQ123abc/EasyLock/releases" target="_blank" rel="noopener">测试版本</a>
+          <a href="https://github.com/YQYQYQ123abc/EasyLock" target="_blank" rel="noopener">GitHub</a>
+        </div>
+      </div>
+    </div>
+  </footer>
+</body>
+</html>

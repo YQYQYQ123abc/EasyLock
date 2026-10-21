@@ -1,29 +1,132 @@
-<!doctype html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="description" content="EasyLock：免费、离线的 macOS 文件加密工具。查看测试版本、隐私说明与使用支持。"><title>隐私说明 · EasyLock</title><link rel="icon" href="icon.png"><link rel="stylesheet" href="style.css"></head><body><header><a class="brand" href="index.html"><img src="icon.png" alt="">EasyLock</a><nav aria-label="主导航"><a href="privacy.html">隐私</a><a href="support.html">支持</a><a href="https://github.com/YQYQYQ123abc/EasyLock">GitHub</a></nav></header><main><span class="eyebrow">PRIVACY</span><h1>隐私说明</h1><div class="policy">EasyLock 隐私说明
-更新日期：2026 年 10 月 13 日
-适用范围：免费离线版 EasyLock 及其预览、缩略图和桌面小组件。
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="description" content="EasyLock 隐私说明：本地处理、文件记录、密码与 Touch ID、预览、小组件和第三方同步。">
+  <title>隐私说明 · EasyLock</title>
+  <link rel="icon" href="icon.png">
+  <link rel="apple-touch-icon" href="icon.png">
+  <meta name="theme-color" content="#f4f4f0" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#09090a" media="(prefers-color-scheme: dark)">
+  <meta property="og:type" content="article">
+  <meta property="og:title" content="隐私说明 · EasyLock">
+  <meta property="og:description" content="EasyLock 隐私说明：本地处理、文件记录、密码与 Touch ID、预览、小组件和第三方同步。">
+  <meta property="og:image" content="https://yqyqyq123abc.github.io/EasyLock/screens/library.jpg">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <a class="skip-link" href="#main">跳到主要内容</a>
 
-本地处理与联网
-EasyLock 无需账号、许可证或激活。应用在本机加密和解密文件，不向开发者上传文件、密码、路径、使用记录或设备标识；不包含广告、跟踪或分析服务，也不自动联网检查更新。
+  <header class="site-header">
+    <div class="wrap header-inner">
+      <a class="brand" href="index.html" aria-label="EasyLock 首页">
+        <img src="icon.png" width="42" height="42" alt="">
+        <span>
+          <span class="brand-name">EasyLock</span>
+          <span class="brand-sub">LOCAL VAULT</span>
+        </span>
+      </a>
+      <nav class="nav" aria-label="主导航">
+        <a class="nav-optional" href="index.html#features">功能</a>
+        <a class="nav-optional" href="index.html#screens">界面</a>
+        <a href="privacy.html" aria-current="page">隐私</a>
+        <a href="support.html">支持</a>
+        <a class="nav-github" href="https://github.com/YQYQYQ123abc/EasyLock" target="_blank" rel="noopener">
+          GitHub
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 4h6v6"/><path d="M20 4l-9 9"/><path d="M19 14v5a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V6a1 1 0 0 1 1-1h5"/></svg>
+        </a>
+      </nav>
+    </div>
+  </header>
 
-文件及本地记录
-应用读取你选择或授权的文件与目录，保存和恢复文件内容及支持的元数据。为显示文件列表、重新访问文件和处理未完成任务，应用会在本机保存文件名、路径、访问书签、操作记录及偏好设置。这些本地记录不等同于密文文件的加密保护；请同时保护你的 macOS 用户账户和设备。加解密过程会在操作位置创建用于校验和恢复的临时数据，异常中断后可能需要在应用中完成恢复。
+  <main id="main" class="wrap">
+    <section class="page-hero">
+      <p class="eyebrow"><span class="eyebrow-dot"></span>PRIVACY</p>
+      <h1>隐私说明</h1>
+      <p class="lead">下面是应用内隐私说明的网页版本。EasyLock 无需账号、不上传文件、密码或使用记录，加解密与预览都在本机完成。</p>
+    </section>
 
-密码、Touch ID 与恢复密钥
-主密码用于本机验证和文件加密。启用 Touch ID 时，应用通过系统钥匙串保存受生物识别访问控制保护的凭据；EasyLock 无法读取你的指纹图像。系统负责生物识别验证。应用保存恢复密钥的公开部分，完整恢复密钥需要你自行保管。开发者无法代你找回遗失的密码或恢复密钥。
+    <div class="docs-layout">
+      <nav class="docs-nav" aria-label="本页内容">
+        <p class="docs-nav-title">本页内容</p>
+        <a href="#local">本地处理与联网</a>
+        <a href="#records">文件及本地记录</a>
+        <a href="#credentials">密码与恢复密钥</a>
+        <a href="#clipboard">密码 App 与剪贴板</a>
+        <a href="#preview">预览与小组件</a>
+        <a href="#sync">系统与第三方同步</a>
+        <a href="#retention">保留与删除</a>
+        <a href="#feedback">问题反馈</a>
+      </nav>
 
-苹果“密码”与剪贴板
-保存到苹果“密码”是由你主动复制并手动创建记录的过程。EasyLock 会对复制的敏感内容标记为临时内容，并在 30 秒后、锁定应用或正常退出时尝试清除仍属于此次复制的内容；若剪贴板已被其他内容替换则不会清除。其他软件仍可能在清除前读取剪贴板。苹果“密码”的同步受你的 Apple 账户和系统设置控制。
+      <div class="docs-content">
+        <div class="meta-strip">
+          <span><strong>更新日期</strong> 2026 年 10 月 13 日</span>
+          <span><strong>适用范围</strong> 免费离线版 EasyLock 及其预览、缩略图和桌面小组件</span>
+        </div>
 
-预览与小组件
-Finder 预览和缩略图只检查密文标识并显示固定的锁定提示，不解密文件内容。应用内按空格预览需要验证对应凭据，会在本机受限缓存目录临时解密整个项目，保留原密文。关闭、锁定或正常退出时清理应用临时副本，异常退出后在下次启动时尝试清理；清理失败会提示。内容显示使用 macOS Quick Look，系统或已安装的第三方预览扩展可能处理内容并保留缓存，EasyLock 无法保证清除这些缓存。小组件默认隐藏记录数量；开启后，仅通过本机 App Group 共享数量与更新时间，不共享文件名、路径或密码。
+        <section class="docs-section" id="local">
+          <h2>本地处理与联网</h2>
+          <p>EasyLock 无需账号、许可证或激活。应用在本机加密和解密文件，不向开发者上传文件、密码、路径、使用记录或设备标识；不包含广告、跟踪或分析服务，也不自动联网检查更新。</p>
+        </section>
 
-系统与第三方同步
-你选择的云盘目录、系统备份、苹果“密码”、App Store 及系统诊断可能由 Apple 或其他服务处理数据，遵循相应服务的设置与政策。EasyLock 不控制这些服务，加密当前文件也不会清除既有备份、快照、缓存或其他明文副本。
+        <section class="docs-section" id="records">
+          <h2>文件及本地记录</h2>
+          <p>应用读取你选择或授权的文件与目录，保存和恢复文件内容及支持的元数据。为显示文件列表、重新访问文件和处理未完成任务，应用会在本机保存文件名、路径、访问书签、操作记录及偏好设置。这些本地记录不等同于密文文件的加密保护；请同时保护你的 macOS 用户账户和设备。加解密过程会在操作位置创建用于校验和恢复的临时数据，异常中断后可能需要在应用中完成恢复。</p>
+        </section>
 
-保留与删除
-解密后文件保留在你选择的位置。删除应用不代表已删除密文、本地容器、钥匙串项目或系统备份。清理前请先确认所有需要的文件能解密，并另存密码及恢复密钥；不要在任务未完成时手动删除事务或恢复目录。
+        <section class="docs-section" id="credentials">
+          <h2>密码、Touch ID 与恢复密钥</h2>
+          <p>主密码用于本机验证和文件加密。启用 Touch ID 时，应用通过系统钥匙串保存受生物识别访问控制保护的凭据；EasyLock 无法读取你的指纹图像。系统负责生物识别验证。应用保存恢复密钥的公开部分，完整恢复密钥需要你自行保管。开发者无法代你找回遗失的密码或恢复密钥。</p>
+        </section>
 
-问题反馈
-当前项目地址：https://github.com/YQYQYQ123abc/EasyLock
-发布后的支持入口以正式下载页为准。不要在公开反馈中附上密码、恢复密钥、私人文件或未经检查的完整路径。若你自行发送反馈，接收平台可能按其政策处理你提供的信息。
-</div></main><footer>EasyLock · 免费离线应用 · macOS 14 及以上<br>应用不联网；网站由 GitHub Pages 托管，访问网站适用 GitHub 的隐私政策。<a href="https://docs.github.com/en/site-policy/privacy-policies/github-general-privacy-statement">了解网站托管隐私</a></footer></body></html>
+        <section class="docs-section" id="clipboard">
+          <h2>苹果“密码”与剪贴板</h2>
+          <p>保存到苹果“密码”是由你主动复制并手动创建记录的过程。EasyLock 会对复制的敏感内容标记为临时内容，并在 30 秒后、锁定应用或正常退出时尝试清除仍属于此次复制的内容；若剪贴板已被其他内容替换则不会清除。其他软件仍可能在清除前读取剪贴板。苹果“密码”的同步受你的 Apple 账户和系统设置控制。</p>
+        </section>
+
+        <section class="docs-section" id="preview">
+          <h2>预览与小组件</h2>
+          <p>Finder 预览和缩略图只检查密文标识并显示固定的锁定提示，不解密文件内容。应用内按空格预览需要验证对应凭据，会在本机受限缓存目录临时解密整个项目，保留原密文。关闭、锁定或正常退出时清理应用临时副本，异常退出后在下次启动时尝试清理；清理失败会提示。内容显示使用 macOS Quick Look，系统或已安装的第三方预览扩展可能处理内容并保留缓存，EasyLock 无法保证清除这些缓存。小组件默认隐藏记录数量；开启后，仅通过本机 App Group 共享数量与更新时间，不共享文件名、路径或密码。</p>
+        </section>
+
+        <section class="docs-section" id="sync">
+          <h2>系统与第三方同步</h2>
+          <p>你选择的云盘目录、系统备份、苹果“密码”、App Store 及系统诊断可能由 Apple 或其他服务处理数据，遵循相应服务的设置与政策。EasyLock 不控制这些服务，加密当前文件也不会清除既有备份、快照、缓存或其他明文副本。</p>
+        </section>
+
+        <section class="docs-section" id="retention">
+          <h2>保留与删除</h2>
+          <p>解密后文件保留在你选择的位置。删除应用不代表已删除密文、本地容器、钥匙串项目或系统备份。清理前请先确认所有需要的文件能解密，并另存密码及恢复密钥；不要在任务未完成时手动删除事务或恢复目录。</p>
+        </section>
+
+        <section class="docs-section" id="feedback">
+          <h2>问题反馈</h2>
+          <p>当前项目地址：<a href="https://github.com/YQYQYQ123abc/EasyLock" target="_blank" rel="noopener">github.com/YQYQYQ123abc/EasyLock</a></p>
+          <p>发布后的支持入口以正式下载页为准。不要在公开反馈中附上密码、恢复密钥、私人文件或未经检查的完整路径。若你自行发送反馈，接收平台可能按其政策处理你提供的信息。</p>
+        </section>
+
+        <p class="section-note">本页为应用内隐私说明的网页版本。本次仅更新页面排版与导航，政策正文未变。</p>
+      </div>
+    </div>
+  </main>
+
+  <footer class="site-footer">
+    <div class="wrap">
+      <div class="footer-inner">
+        <div>
+          <a class="footer-brand" href="index.html"><img src="icon.png" width="26" height="26" alt="">EasyLock</a>
+          <p class="footer-note">免费离线应用 · macOS 14 及以上<br>应用不联网；网站由 GitHub Pages 托管，访问网站适用 GitHub 的隐私政策。<a href="https://docs.github.com/en/site-policy/privacy-policies/github-general-privacy-statement" target="_blank" rel="noopener">了解网站托管隐私</a></p>
+        </div>
+        <div class="footer-links">
+          <a href="privacy.html">隐私</a>
+          <a href="support.html">支持</a>
+          <a href="https://github.com/YQYQYQ123abc/EasyLock/releases" target="_blank" rel="noopener">测试版本</a>
+          <a href="https://github.com/YQYQYQ123abc/EasyLock" target="_blank" rel="noopener">GitHub</a>
+        </div>
+      </div>
+    </div>
+  </footer>
+</body>
+</html>
