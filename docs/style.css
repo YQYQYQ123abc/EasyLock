@@ -403,6 +403,8 @@ h1, h2, h3 { text-wrap: balance; }
   padding: 2px 7px;
 }
 .figure .window { border-radius: var(--radius-md); box-shadow: var(--shadow-soft); }
+.gallery .figure:last-child:nth-child(odd) { grid-column: 1 / -1; }
+.gallery .figure:last-child:nth-child(odd) .window { max-width: 1140px; margin-inline: auto; }
 
 /* System integration */
 .system { display: grid; grid-template-columns: 1.03fr 0.97fr; gap: 16px; align-items: stretch; }
