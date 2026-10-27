@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		B70000000000000000000071 /* EasyLockPreview/PreviewIcon.png in Resources */ = {isa = PBXBuildFile; fileRef = B70000000000000000000070 /* EasyLockPreview/PreviewIcon.png */; };
 		E10000000000000000000013 = {isa = PBXBuildFile; fileRef = E10000000000000000000003; };
 		E10000000000000000000012 = {isa = PBXBuildFile; fileRef = E10000000000000000000002; };
 		E10000000000000000000011 = {isa = PBXBuildFile; fileRef = E10000000000000000000001; };
@@ -62,6 +63,7 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		B70000000000000000000070 /* EasyLockPreview/PreviewIcon.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = EasyLockPreview/PreviewIcon.png; sourceTree = "<group>"; };
 		E10000000000000000000003 = {isa = PBXFileReference; lastKnownFileType = image.png; path = EasyLockThumbnail/LockedInfo.png; sourceTree = "<group>"; };
 		E10000000000000000000002 = {isa = PBXFileReference; lastKnownFileType = image.png; path = EasyLockThumbnail/InvalidThumbnail.png; sourceTree = "<group>"; };
 		E10000000000000000000001 = {isa = PBXFileReference; lastKnownFileType = image.png; path = EasyLockThumbnail/LockedThumbnail.png; sourceTree = "<group>"; };
@@ -122,6 +124,7 @@
 				B70000000000000000000001 /* PreviewShared/LockedPreview.swift */,
 				B700000000000000000000CA /* EasyLockThumbnail/ThumbnailProvider.swift */,
 				B70000000000000000000066 /* EasyLockPreview/PreviewProvider.swift */,
+				B70000000000000000000070 /* EasyLockPreview/PreviewIcon.png */,
 				7DEA656D307A286100FFA269 /* Products */,
 			);
 			sourceTree = "<group>";
@@ -252,6 +255,7 @@
 		D90000000000000000000103 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			files = (
+				B70000000000000000000071 /* EasyLockPreview/PreviewIcon.png in Resources */,
 				D90000000000000000000102 /* EasyLockPreview/PrivacyInfo.xcprivacy in Resources */,
 			);
 		};
