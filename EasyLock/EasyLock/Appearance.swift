@@ -83,25 +83,17 @@ struct ShieldMark: View {
     var size: CGFloat = 64
     var tone: Tone = .auto
 
-    private var gradientTop: Color {
-        switch tone {
-        case .light: Color(red: 0.12, green: 0.62, blue: 0.98)
-        case .dark: Color(red: 0.00, green: 0.47, blue: 0.90)
-        case .auto: Color(red: 0.00, green: 0.533, blue: 1.0)
-        }
-    }
-
     var body: some View {
         ZStack {
             ShieldShape()
                 .fill(
-                    LinearGradient(colors: [gradientTop,
-                                            Color(red: 0.00, green: 0.654, blue: 0.91),
-                                            Color(red: 0.00, green: 0.765, blue: 0.816)],
+                    LinearGradient(colors: [Color(red: 0.20, green: 0.51, blue: 1.0),
+                                            Color(red: 0.02, green: 0.36, blue: 0.94),
+                                            Color(red: 0.00, green: 0.27, blue: 0.82)],
                                    startPoint: .topLeading, endPoint: .bottomTrailing)
                 )
             ShieldShape()
-                .stroke(Color.white.opacity(0.38), lineWidth: max(1, size * 0.017))
+                .stroke(Color.white.opacity(0.62), lineWidth: max(1, size * 0.017))
                 .padding(size * 0.090)
             Image(systemName: "lock.fill")
                 .font(.system(size: size * 0.285, weight: .semibold))
@@ -115,32 +107,17 @@ struct ShieldMark: View {
 
 struct BrandMark: View {
     var size: CGFloat = 64
-    var showsTile = true
     @Environment(\.colorScheme) private var scheme
 
-    @ViewBuilder var body: some View {
-        if showsTile {
-            let shape = RoundedRectangle(cornerRadius: size * 0.235, style: .continuous)
-            ZStack {
-                shape
-                    .fill(scheme == .dark
-                          ? LinearGradient(colors: [Color(red: 0.13, green: 0.16, blue: 0.23), Color(red: 0.055, green: 0.07, blue: 0.11)], startPoint: .topLeading, endPoint: .bottomTrailing)
-                          : LinearGradient(colors: [Color.white, Color(red: 0.93, green: 0.96, blue: 1.0)], startPoint: .topLeading, endPoint: .bottomTrailing))
-                    .overlay {
-                        shape.strokeBorder(scheme == .dark ? Color.white.opacity(0.12) : EasyLockStyle.blue.opacity(0.14), lineWidth: 1)
-                    }
-                    .overlay {
-                        shape.inset(by: 1)
-                            .strokeBorder(scheme == .dark ? Color.white.opacity(0.03) : Color.white.opacity(0.9), lineWidth: 1)
-                    }
-                    .shadow(color: .black.opacity(scheme == .dark ? 0.45 : 0.12), radius: size * 0.11, y: size * 0.045)
-                ShieldMark(size: size * 0.70)
-            }
+    var body: some View {
+        Image("BrandMark")
+            .resizable()
+            .interpolation(.high)
             .frame(width: size, height: size)
+            .clipShape(RoundedRectangle(cornerRadius: size * 0.225, style: .continuous))
+            .shadow(color: .black.opacity(scheme == .dark ? 0.42 : 0.14),
+                    radius: size * 0.10, y: size * 0.045)
             .accessibilityHidden(true)
-        } else {
-            ShieldMark(size: size)
-        }
     }
 }
 

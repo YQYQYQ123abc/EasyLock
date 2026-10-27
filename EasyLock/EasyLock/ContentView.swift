@@ -80,7 +80,6 @@ struct ContentView: View {
             }
         }
         .background { WorkspaceBackground() }
-        .animation(reduceMotion ? nil : .easeInOut(duration: 0.22), value: section)
         .animation(reduceMotion ? nil : .easeInOut(duration: 0.18), value: dropTargeted)
         .onAppear {
             store.refreshTouchIDAvailability()

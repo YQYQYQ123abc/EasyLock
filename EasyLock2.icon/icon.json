@@ -1,15 +1,35 @@
 {
-  "fill" : "system-light",
+  "fill" : {
+    "linear-gradient" : [
+      "display-p3:0.98796,1.00000,0.98120,1.00000",
+      "display-p3:0.11532,0.33402,0.94039,1.00000"
+    ]
+  },
   "groups" : [
     {
       "layers" : [
         {
-          "fill" : "system-dark",
+          "fill" : {
+            "linear-gradient" : [
+              "display-p3:0.00000,0.40110,0.94039,1.00000",
+              "extended-gray:1.00000,1.00000"
+            ],
+            "orientation" : {
+              "start" : {
+                "x" : 0.8819145114942529,
+                "y" : 0.5811740451388889
+              },
+              "stop" : {
+                "x" : 0.5,
+                "y" : 1
+              }
+            }
+          },
           "glass" : true,
           "image-name" : "security.png",
           "name" : "security",
           "position" : {
-            "scale" : 1.2,
+            "scale" : 1.5,
             "translation-in-points" : [
               0,
               0
