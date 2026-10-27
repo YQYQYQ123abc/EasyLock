@@ -82,33 +82,31 @@ struct ShieldMark: View {
     enum Tone { case auto, light, dark }
     var size: CGFloat = 64
     var tone: Tone = .auto
-    @Environment(\.colorScheme) private var scheme
 
-    private var lightSilhouette: Bool {
+    private var gradientTop: Color {
         switch tone {
-        case .light: true
-        case .dark: false
-        case .auto: scheme == .dark
+        case .light: Color(red: 0.12, green: 0.62, blue: 0.98)
+        case .dark: Color(red: 0.00, green: 0.47, blue: 0.90)
+        case .auto: Color(red: 0.00, green: 0.533, blue: 1.0)
         }
     }
 
     var body: some View {
-        let silhouette = lightSilhouette
         ZStack {
-            ShieldShape().fill(
-                LinearGradient(colors: silhouette
-                               ? [Color.white, Color(red: 0.90, green: 0.90, blue: 0.88)]
-                               : [Color(red: 0.115, green: 0.115, blue: 0.122), Color(red: 0.025, green: 0.025, blue: 0.03)],
-                               startPoint: .top, endPoint: .bottom)
-            )
             ShieldShape()
-                .stroke(silhouette ? Color.black.opacity(0.20) : Color.white.opacity(0.52),
-                        lineWidth: max(1, size * 0.018))
-                .padding(size * 0.088)
+                .fill(
+                    LinearGradient(colors: [gradientTop,
+                                            Color(red: 0.00, green: 0.654, blue: 0.91),
+                                            Color(red: 0.00, green: 0.765, blue: 0.816)],
+                                   startPoint: .topLeading, endPoint: .bottomTrailing)
+                )
+            ShieldShape()
+                .stroke(Color.white.opacity(0.38), lineWidth: max(1, size * 0.017))
+                .padding(size * 0.090)
             Image(systemName: "lock.fill")
-                .font(.system(size: size * 0.30, weight: .semibold))
-                .foregroundStyle(silhouette ? Color.black.opacity(0.88) : Color.white.opacity(0.95))
-                .offset(y: size * 0.006)
+                .font(.system(size: size * 0.285, weight: .semibold))
+                .foregroundStyle(.white)
+                .offset(y: size * 0.012)
         }
         .frame(width: size, height: size)
         .accessibilityHidden(true)
@@ -126,16 +124,16 @@ struct BrandMark: View {
             ZStack {
                 shape
                     .fill(scheme == .dark
-                          ? LinearGradient(colors: [Color(red: 0.135, green: 0.135, blue: 0.145), Color(red: 0.05, green: 0.05, blue: 0.056)], startPoint: .topLeading, endPoint: .bottomTrailing)
-                          : LinearGradient(colors: [Color.white, Color(red: 0.965, green: 0.965, blue: 0.95)], startPoint: .topLeading, endPoint: .bottomTrailing))
+                          ? LinearGradient(colors: [Color(red: 0.13, green: 0.16, blue: 0.23), Color(red: 0.055, green: 0.07, blue: 0.11)], startPoint: .topLeading, endPoint: .bottomTrailing)
+                          : LinearGradient(colors: [Color.white, Color(red: 0.93, green: 0.96, blue: 1.0)], startPoint: .topLeading, endPoint: .bottomTrailing))
                     .overlay {
-                        shape.strokeBorder(scheme == .dark ? Color.white.opacity(0.10) : Color.black.opacity(0.08), lineWidth: 1)
+                        shape.strokeBorder(scheme == .dark ? Color.white.opacity(0.12) : EasyLockStyle.blue.opacity(0.14), lineWidth: 1)
                     }
                     .overlay {
                         shape.inset(by: 1)
                             .strokeBorder(scheme == .dark ? Color.white.opacity(0.03) : Color.white.opacity(0.9), lineWidth: 1)
                     }
-                    .shadow(color: .black.opacity(scheme == .dark ? 0.45 : 0.16), radius: size * 0.11, y: size * 0.045)
+                    .shadow(color: .black.opacity(scheme == .dark ? 0.45 : 0.12), radius: size * 0.11, y: size * 0.045)
                 ShieldMark(size: size * 0.70)
             }
             .frame(width: size, height: size)
@@ -167,9 +165,9 @@ struct GlassPanel: View {
                         .strokeBorder(scheme == .dark ? Color.white.opacity(0.035) : Color.white.opacity(0.85), lineWidth: 1)
                 }
             }
-            .shadow(color: .black.opacity(radius > 0 ? (scheme == .dark ? 0.34 : 0.065) : 0),
-                    radius: radius > 0 ? 18 : 0,
-                    y: radius > 0 ? 6 : 0)
+            .shadow(color: .black.opacity(radius > 0 ? (scheme == .dark ? 0.28 : 0.045) : 0),
+                    radius: radius > 0 ? 14 : 0,
+                    y: radius > 0 ? 4 : 0)
     }
 }
 

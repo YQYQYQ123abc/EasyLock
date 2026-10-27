@@ -9,7 +9,6 @@ struct OverviewView: View {
     let openItem: (LockedItem) -> Void
 
     private let sideColumnWidth: CGFloat = 288
-    private let rowHeight: CGFloat = 238
 
     var body: some View {
         ScrollView {
@@ -22,23 +21,17 @@ struct OverviewView: View {
 
                 metricRow
 
-                HStack(alignment: .top, spacing: 16) {
+                DashboardRow(sideWidth: sideColumnWidth, minHeight: 232) {
                     heroCard
-                        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
+                } right: {
                     securityCard
-                        .frame(width: sideColumnWidth)
-                        .frame(maxHeight: .infinity, alignment: .topLeading)
                 }
-                .frame(height: rowHeight)
 
-                HStack(alignment: .top, spacing: 16) {
+                DashboardRow(sideWidth: sideColumnWidth, minHeight: 232) {
                     recentCard
-                        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
+                } right: {
                     activityCard
-                        .frame(width: sideColumnWidth)
-                        .frame(maxHeight: .infinity, alignment: .topLeading)
                 }
-                .frame(height: rowHeight)
             }
             .padding(24)
         }
@@ -104,7 +97,7 @@ struct OverviewView: View {
     // MARK: - Metrics
 
     private var metricRow: some View {
-        HStack(spacing: 12) {
+        HStack(spacing: 16) {
             metricCard(title: "加密文件",
                        value: "\(store.items.count)",
                        unit: "项",
@@ -131,7 +124,7 @@ struct OverviewView: View {
                        soft: attentionCount == 0 ? EasyLockStyle.successSoft : EasyLockStyle.warningSoft)
                 .frame(width: sideColumnWidth)
         }
-        .frame(height: 102)
+        .frame(minHeight: 102)
     }
 
     private func metricCard(title: String,
@@ -314,9 +307,8 @@ struct OverviewView: View {
                 .frame(maxWidth: .infinity, alignment: .leading)
             }
             .buttonStyle(BrandGhostButtonStyle())
-            .padding(.leading, -6)
         }
-        .padding(16)
+        .padding(18)
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
         .background { GlassPanel(radius: 22) }
     }
@@ -370,7 +362,7 @@ struct OverviewView: View {
             }
             .foregroundStyle(EasyLockStyle.tertiary)
         }
-        .padding(16)
+        .padding(18)
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
         .background { GlassPanel(radius: 22) }
     }
@@ -449,7 +441,7 @@ struct OverviewView: View {
             }
             Spacer(minLength: 0)
         }
-        .padding(16)
+        .padding(18)
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
         .background { GlassPanel(radius: 22) }
     }
@@ -567,6 +559,53 @@ struct OverviewView: View {
         let title: String
         let detail: String
         let done: Bool
+    }
+}
+
+/// Keeps the two cards in a dashboard row the same height without imposing a
+/// fixed height that can clip text when a label wraps or the window narrows.
+private struct DashboardRow<Left: View, Right: View>: View {
+    let sideWidth: CGFloat
+    var minHeight: CGFloat = 232
+    @ViewBuilder var left: Left
+    @ViewBuilder var right: Right
+
+    var body: some View {
+        DashboardRowLayout(sideWidth: sideWidth, minHeight: minHeight) {
+            left
+            right
+        }
+    }
+}
+
+private struct DashboardRowLayout: Layout {
+    let sideWidth: CGFloat
+    var minHeight: CGFloat = 232
+    var spacing: CGFloat = 16
+
+    func sizeThatFits(proposal: ProposedViewSize, subviews: Subviews, cache: inout ()) -> CGSize {
+        let width = proposal.width ?? 0
+        let leftWidth = max(0, width - spacing - sideWidth)
+        let leftHeight = subviews[0]
+            .sizeThatFits(ProposedViewSize(width: leftWidth, height: nil))
+            .height
+        let rightHeight = subviews[1]
+            .sizeThatFits(ProposedViewSize(width: sideWidth, height: nil))
+            .height
+        let measured = [leftHeight, rightHeight].filter { $0.isFinite && $0 > 0 }.max() ?? minHeight
+        return CGSize(width: width, height: max(minHeight, measured))
+    }
+
+    func placeSubviews(in bounds: CGRect, proposal: ProposedViewSize, subviews: Subviews, cache: inout ()) {
+        let leftWidth = max(0, bounds.width - spacing - sideWidth)
+        subviews[0].place(
+            at: CGPoint(x: bounds.minX, y: bounds.minY),
+            proposal: ProposedViewSize(width: leftWidth, height: bounds.height)
+        )
+        subviews[1].place(
+            at: CGPoint(x: bounds.minX + leftWidth + spacing, y: bounds.minY),
+            proposal: ProposedViewSize(width: sideWidth, height: bounds.height)
+        )
     }
 }
 
