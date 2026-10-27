@@ -30,30 +30,28 @@ struct LocalFilesView: View {
                             symbol: "internaldrive")
                 Spacer(minLength: 8)
                 if browser.root != nil {
-                    Menu {
-                        Button("刷新当前目录", systemImage: "arrow.clockwise") { Task { await browser.refresh() } }.keyboardShortcut("r")
-                        Button("搜索当前目录") { searchFocused = true }.keyboardShortcut("f")
-                        Divider()
-                        Picker("排序", selection: $sort) {
-                            Text("名称 A–Z").tag("name")
-                            Text("名称 Z–A").tag("descending")
-                            Text("文件大小优先").tag("size")
-                        }
-                        Divider()
-                        Button("关闭并忘记浏览位置", systemImage: "xmark.circle") { browser.forget() }
-                    } label: {
-                        Image(systemName: "ellipsis")
-                            .font(.system(size: 11, weight: .semibold))
-                            .foregroundStyle(EasyLockStyle.ink)
-                            .frame(width: 30, height: 30)
-                            .background(EasyLockStyle.surface, in: RoundedRectangle(cornerRadius: 8, style: .continuous))
-                            .overlay {
-                                RoundedRectangle(cornerRadius: 8, style: .continuous)
-                                    .strokeBorder(EasyLockStyle.border, lineWidth: 1)
+                    ZStack {
+                        Menu {
+                            Button("刷新当前目录", systemImage: "arrow.clockwise") { Task { await browser.refresh() } }.keyboardShortcut("r")
+                            Button("搜索当前目录") { searchFocused = true }.keyboardShortcut("f")
+                            Divider()
+                            Picker("排序", selection: $sort) {
+                                Text("名称 A–Z").tag("name")
+                                Text("名称 Z–A").tag("descending")
+                                Text("文件大小优先").tag("size")
                             }
+                            Divider()
+                            Button("关闭并忘记浏览位置", systemImage: "xmark.circle") { browser.forget() }
+                        } label: {
+                            Image(systemName: "ellipsis")
+                                .font(.system(size: 12, weight: .semibold))
+                                .foregroundStyle(EasyLockStyle.blueDeep)
+                                .frame(width: 32, height: 32)
+                        }
+                        .menuStyle(.borderlessButton)
+                        .menuIndicator(.hidden)
                     }
-                    .menuStyle(.borderlessButton)
-                    .menuIndicator(.hidden)
+                    .iconControl(size: 32)
                     .fixedSize()
                     .disabled(browser.loading)
                     .help("目录操作")
@@ -62,8 +60,8 @@ struct LocalFilesView: View {
                     .buttonStyle(BrandPrimaryButtonStyle())
                     .disabled(!store.canPresentPicker || browser.loading)
             }
-            .padding(.horizontal, 26)
-            .padding(.vertical, 16)
+            .padding(.horizontal, 24)
+            .padding(.vertical, 20)
 
             if browser.root != nil {
                 VStack(alignment: .leading, spacing: 10) {
@@ -79,8 +77,8 @@ struct LocalFilesView: View {
                         }
                         HStack(spacing: 7) {
                             Image(systemName: "folder")
-                                .font(.system(size: 9, weight: .medium))
-                                .foregroundStyle(.secondary)
+                                .font(.system(size: 9, weight: .semibold))
+                                .foregroundStyle(EasyLockStyle.blueDeep)
                             Text(browser.directory?.path ?? "")
                                 .font(.system(size: 10))
                                 .foregroundStyle(.secondary)
@@ -89,8 +87,8 @@ struct LocalFilesView: View {
                                 .help(browser.directory?.path ?? "")
                         }
                         .padding(.horizontal, 10)
-                        .frame(maxWidth: .infinity, minHeight: 26, alignment: .leading)
-                        .background(EasyLockStyle.surfaceMuted, in: RoundedRectangle(cornerRadius: 7, style: .continuous))
+                        .frame(maxWidth: .infinity, minHeight: 28, alignment: .leading)
+                        .background(EasyLockStyle.surfaceMuted, in: RoundedRectangle(cornerRadius: 8, style: .continuous))
 
                         Picker("显示方式", selection: $listMode) {
                             Image(systemName: "square.grid.2x2").tag(false)
@@ -108,7 +106,7 @@ struct LocalFilesView: View {
                         Spacer(minLength: 0)
                     }
                 }
-                .padding(.horizontal, 26)
+                .padding(.horizontal, 24)
                 .padding(.bottom, 14)
             }
 
@@ -116,7 +114,7 @@ struct LocalFilesView: View {
 
             if let message = browser.message {
                 InlineNotice(text: message)
-                    .padding(.horizontal, 26)
+                    .padding(.horizontal, 24)
                     .padding(.top, 12)
             }
 
@@ -157,13 +155,13 @@ struct LocalFilesView: View {
                         LazyVStack(spacing: 1) {
                             ForEach(visible) { entry in fileRow(entry) }
                         }
-                        .padding(.horizontal, 18)
+                        .padding(.horizontal, 24)
                         .padding(.vertical, 10)
                     } else {
                         LazyVGrid(columns: [GridItem(.adaptive(minimum: 224), spacing: 14)], spacing: 14) {
                             ForEach(visible) { entry in fileCard(entry) }
                         }
-                        .padding(20)
+                        .padding(24)
                     }
                 }
                 .focusable()
@@ -183,7 +181,7 @@ struct LocalFilesView: View {
                 }
                 .font(.system(size: 10))
                 .foregroundStyle(.secondary)
-                .padding(.horizontal, 26)
+                .padding(.horizontal, 24)
                 .frame(height: 44)
                 .background(EasyLockStyle.surfaceRaised)
             } else {
@@ -192,7 +190,7 @@ struct LocalFilesView: View {
                     Spacer(minLength: 12)
                     if !selected.isEmpty { batchActions }
                 }
-                .padding(.horizontal, 26)
+                .padding(.horizontal, 24)
                 .frame(minHeight: 52)
                 .background(EasyLockStyle.surfaceRaised)
             }
@@ -211,14 +209,9 @@ struct LocalFilesView: View {
     private func navButton(_ symbol: String, _ help: String, disabled: Bool, action: @escaping () -> Void) -> some View {
         Button(action: action) {
             Image(systemName: symbol)
-                .font(.system(size: 10, weight: .semibold))
-                .foregroundStyle(disabled ? EasyLockStyle.tertiary : EasyLockStyle.ink)
-                .frame(width: 26, height: 26)
-                .background(EasyLockStyle.surface, in: RoundedRectangle(cornerRadius: 7, style: .continuous))
-                .overlay {
-                    RoundedRectangle(cornerRadius: 7, style: .continuous)
-                        .strokeBorder(EasyLockStyle.border, lineWidth: 1)
-                }
+                .font(.system(size: 10.5, weight: .semibold))
+                .foregroundStyle(disabled ? EasyLockStyle.tertiary : EasyLockStyle.blueDeep)
+                .iconControl(size: 28)
         }
         .buttonStyle(.plain)
         .disabled(disabled)
@@ -381,23 +374,26 @@ struct LocalFilesView: View {
                 .frame(width: 72, alignment: .trailing)
             Button { store.previewLocalFile(entry) } label: {
                 Image(systemName: "eye")
-                    .font(.system(size: 11))
-                    .foregroundStyle(EasyLockStyle.ink)
-                    .frame(width: 24, height: 24)
+                    .font(.system(size: 11, weight: .semibold))
+                    .foregroundStyle(EasyLockStyle.blueDeep)
+                    .iconControl(size: 26, bordered: false)
             }
             .buttonStyle(.plain)
             .disabled(unavailable || !store.canPresentPicker)
             .help("预览")
             .accessibilityLabel("预览")
 
-            Menu { itemMenu(entry) } label: {
-                Image(systemName: "ellipsis")
-                    .font(.system(size: 11, weight: .semibold))
-                    .foregroundStyle(.secondary)
-                    .frame(width: 22, height: 22)
+            ZStack {
+                Menu { itemMenu(entry) } label: {
+                    Image(systemName: "ellipsis")
+                        .font(.system(size: 11, weight: .semibold))
+                        .foregroundStyle(EasyLockStyle.blueDeep)
+                        .frame(width: 26, height: 26)
+                }
+                .menuStyle(.borderlessButton)
+                .menuIndicator(.hidden)
             }
-            .menuStyle(.borderlessButton)
-            .menuIndicator(.hidden)
+            .iconControl(size: 26, bordered: false)
             .fixedSize()
         }
         .padding(.horizontal, 10)
@@ -464,9 +460,9 @@ struct LocalFilesView: View {
                 }
                 Button { store.previewLocalFile(entry) } label: {
                     Image(systemName: "eye")
-                        .font(.system(size: 11))
-                        .foregroundStyle(EasyLockStyle.ink)
-                        .frame(width: 24, height: 24)
+                        .font(.system(size: 11, weight: .semibold))
+                        .foregroundStyle(EasyLockStyle.blueDeep)
+                        .iconControl(size: 26, bordered: false)
                 }
                 .buttonStyle(.plain)
                 .help("预览（空格键）")

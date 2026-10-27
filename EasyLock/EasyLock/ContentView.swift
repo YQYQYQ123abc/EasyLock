@@ -534,11 +534,11 @@ struct ContentView: View {
                     Text("已收到 \(store.pendingURLs.count) 个项目，解锁后继续")
                         .font(.system(size: 10.5, weight: .medium))
                 }
-                .foregroundStyle(EasyLockStyle.ink)
+                .foregroundStyle(EasyLockStyle.blueDeep)
                 .padding(.horizontal, 12)
                 .padding(.vertical, 6)
-                .background(EasyLockStyle.surface, in: Capsule())
-                .overlay { Capsule().strokeBorder(EasyLockStyle.border, lineWidth: 1) }
+                .background(EasyLockStyle.blueSoft, in: Capsule())
+                .overlay { Capsule().strokeBorder(EasyLockStyle.blue.opacity(0.18), lineWidth: 1) }
             }
 
             BrandMark(size: 104)
@@ -698,8 +698,12 @@ struct ContentView: View {
     }
 
     private func welcomeFeature(_ symbol: String, _ text: String) -> some View {
-        HStack(spacing: 4) {
-            Image(systemName: symbol).font(.system(size: 8.5, weight: .medium))
+        HStack(spacing: 5) {
+            Image(systemName: symbol)
+                .font(.system(size: 8, weight: .semibold))
+                .foregroundStyle(EasyLockStyle.blueDeep)
+                .frame(width: 18, height: 18)
+                .background(EasyLockStyle.blueSoft, in: RoundedRectangle(cornerRadius: 5.5, style: .continuous))
             Text(text).font(.system(size: 9.5, weight: .medium))
         }
         .foregroundStyle(EasyLockStyle.secondary)
@@ -736,8 +740,8 @@ struct ContentView: View {
                 .frame(width: 84)
                 .help("切换卡片或列表")
             }
-            .padding(.horizontal, 26)
-            .padding(.vertical, 16)
+            .padding(.horizontal, 24)
+            .padding(.vertical, 20)
 
             librarySummary
                 .padding(.horizontal, 24)
@@ -851,26 +855,24 @@ struct ContentView: View {
     }
 
     private var libraryMoreMenu: some View {
-        Menu {
-            Button("添加文件夹…") { store.chooseSources(foldersOnly: true) }
-            Button("导入已有密文…") { store.importFiles() }
-            if !store.outcomes.isEmpty {
-                Divider()
-                Button("上次任务结果") { store.showResults = true }
-            }
-        } label: {
-            Image(systemName: "ellipsis")
-                .font(.system(size: 12, weight: .semibold))
-                .foregroundStyle(EasyLockStyle.secondary)
-                .frame(width: 32, height: 32)
-                .background(EasyLockStyle.surface, in: RoundedRectangle(cornerRadius: 9, style: .continuous))
-                .overlay {
-                    RoundedRectangle(cornerRadius: 9, style: .continuous)
-                        .strokeBorder(EasyLockStyle.border, lineWidth: 1)
+        ZStack {
+            Menu {
+                Button("添加文件夹…") { store.chooseSources(foldersOnly: true) }
+                Button("导入已有密文…") { store.importFiles() }
+                if !store.outcomes.isEmpty {
+                    Divider()
+                    Button("上次任务结果") { store.showResults = true }
                 }
+            } label: {
+                Image(systemName: "ellipsis")
+                    .font(.system(size: 12, weight: .semibold))
+                    .foregroundStyle(EasyLockStyle.blueDeep)
+                    .frame(width: 32, height: 32)
+            }
+            .menuStyle(.borderlessButton)
+            .menuIndicator(.hidden)
         }
-        .menuStyle(.borderlessButton)
-        .menuIndicator(.hidden)
+        .iconControl(size: 32)
         .fixedSize()
         .disabled(!store.canPresentPicker || store.busy)
     }
@@ -1187,7 +1189,7 @@ struct ContentView: View {
                     }
                     .padding(.top, 3)
                 } else {
-                    ShieldMark(size: 54)
+                    IconMedallion(symbol: "lock.doc", size: 54)
                         .padding(.bottom, 2)
                     Text("选择文件，查看详情")
                         .font(.system(size: 17, weight: .semibold))
@@ -1314,8 +1316,8 @@ struct ContentView: View {
                     .buttonStyle(BrandSecondaryButtonStyle())
                 }
             }
-            .padding(.horizontal, 26)
-            .padding(.vertical, 16)
+            .padding(.horizontal, 24)
+            .padding(.vertical, 20)
 
             Rectangle().fill(EasyLockStyle.border).frame(height: 1)
 
@@ -1330,10 +1332,9 @@ struct ContentView: View {
                     default: EmptyView()
                     }
                 }
-                .frame(maxWidth: 760, alignment: .leading)
-                .padding(.horizontal, 26)
+                .padding(.horizontal, 24)
                 .padding(.vertical, 24)
-                .frame(maxWidth: .infinity)
+                .frame(maxWidth: .infinity, alignment: .leading)
             }
         }
         .background { WorkspaceBackground() }
@@ -1370,7 +1371,7 @@ struct ContentView: View {
 
     private var securitySettings: some View {
         VStack(alignment: .leading, spacing: 24) {
-            settingsGroup("登录与解锁") {
+            settingsGroup("登录与解锁", symbol: "lock.shield") {
                 VStack(spacing: 0) {
                     settingRow("主密码", detail: "更改后，旧文件仍需原密码或对应恢复密钥。") {
                         Button("更改…") { resettingPassword = false; showPasswordChange = true }
@@ -1411,7 +1412,7 @@ struct ContentView: View {
     }
 
     private var recoveryKeySettings: some View {
-        settingsGroup("恢复密钥") {
+        settingsGroup("恢复密钥", symbol: "key.fill") {
             VStack(alignment: .leading, spacing: 12) {
                 settingRow(store.recoveryPublicKey == nil ? "尚未创建恢复密钥" : "已为新文件启用",
                            detail: "仅适用于启用后新加密的文件。请自行保存完整密钥；更换后保留旧密钥。") {
@@ -1439,7 +1440,7 @@ struct ContentView: View {
 
     private var generalSettings: some View {
         VStack(alignment: .leading, spacing: 24) {
-            settingsGroup("启动与小组件") {
+            settingsGroup("启动与小组件", symbol: "power") {
                 VStack(spacing: 0) {
                     settingRow("登录时启动 EasyLock") {
                         Toggle("登录时启动 EasyLock", isOn: Binding(get: { store.loginEnabled }, set: { store.setLogin($0) }))
@@ -1456,7 +1457,7 @@ struct ContentView: View {
                 }
             }
 
-            settingsGroup("快捷操作") {
+            settingsGroup("快捷操作", symbol: "keyboard") {
                 VStack(spacing: 0) {
                     shortcutRow(keys: ["space"], title: "预览选中的文件或文件夹")
                     rowDivider
@@ -1473,7 +1474,7 @@ struct ContentView: View {
 
     private var themeSettings: some View {
         VStack(alignment: .leading, spacing: 24) {
-            settingsGroup("外观主题") {
+            settingsGroup("外观主题", symbol: "circle.lefthalf.filled") {
                 VStack(alignment: .leading, spacing: 14) {
                     Picker("界面主题", selection: $appearanceMode) {
                         Text("跟随系统").tag("system")
@@ -1481,13 +1482,13 @@ struct ContentView: View {
                         Text("深色").tag("dark")
                     }
                     .pickerStyle(.segmented)
-                    Text("立即应用到 EasyLock 界面。界面使用无彩色设计，颜色仅用于提示需要检查的项目；动画遵循 macOS 辅助功能设置。")
+                    Text("立即应用到 EasyLock 界面。界面以浅色画布、白色卡片和信号蓝强调色为主；动画遵循 macOS 辅助功能设置。")
                         .font(.system(size: 10.5))
                         .foregroundStyle(.secondary)
                         .fixedSize(horizontal: false, vertical: true)
                 }
             }
-            settingsGroup("加密文件默认视图") {
+            settingsGroup("加密文件默认视图", symbol: "lock.doc") {
                 settingRow("默认视图", detail: "下次打开“加密文件”页面时使用。") {
                     Picker("默认视图", selection: $libraryGrid) {
                         Text("卡片").tag(true)
@@ -1536,7 +1537,7 @@ struct ContentView: View {
             .padding(.vertical, 16)
             .background { GlassPanel(radius: 16) }
 
-            settingsGroup("关于此版本") {
+            settingsGroup("关于此版本", symbol: "info.circle") {
                 VStack(alignment: .leading, spacing: 10) {
                     Text(DistributionChannel.updateDescription)
                     Text("云盘与苹果“密码”的同步由相应服务和系统设置管理。")
@@ -1558,9 +1559,16 @@ struct ContentView: View {
         }
     }
 
-    private func settingsGroup<Content: View>(_ title: String, @ViewBuilder content: () -> Content) -> some View {
+    private func settingsGroup<Content: View>(_ title: String, symbol: String, @ViewBuilder content: () -> Content) -> some View {
         VStack(alignment: .leading, spacing: 10) {
-            SectionLabel(title: title)
+            HStack(spacing: 7) {
+                Image(systemName: symbol)
+                    .font(.system(size: 9, weight: .semibold))
+                    .foregroundStyle(EasyLockStyle.blueDeep)
+                    .frame(width: 20, height: 20)
+                    .background(EasyLockStyle.blueSoft, in: RoundedRectangle(cornerRadius: 6, style: .continuous))
+                SectionLabel(title: title)
+            }
             GroupBox { content() }
         }
     }

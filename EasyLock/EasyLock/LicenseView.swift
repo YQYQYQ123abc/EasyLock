@@ -16,8 +16,8 @@ struct LicenseView: View {
                 statusChip
                 #endif
             }
-            .padding(.horizontal, 26)
-            .padding(.vertical, 16)
+            .padding(.horizontal, 24)
+            .padding(.vertical, 20)
 
             Rectangle().fill(EasyLockStyle.border).frame(height: 1)
 
@@ -166,7 +166,7 @@ struct LicenseView: View {
                     }
                 }
                 .frame(maxWidth: 700, alignment: .leading)
-                .padding(.horizontal, 26)
+                .padding(.horizontal, 24)
                 .padding(.vertical, 24)
                 .frame(maxWidth: .infinity)
             }

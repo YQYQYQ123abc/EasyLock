@@ -326,6 +326,34 @@ struct IconMedallion: View {
 }
 
 /// Shared heading keeps page identity and typography stable while switching sections.
+/// Shared size for quiet icon-only controls such as ellipsis menus, eye
+/// buttons, and directory navigation. Keeping one control shape makes the
+/// small iconography read as the same family across pages.
+struct IconControl: ViewModifier {
+    var size: CGFloat = 30
+    var bordered = true
+
+    func body(content: Content) -> some View {
+        content
+            .frame(width: size, height: size)
+            .background(bordered ? EasyLockStyle.surface : EasyLockStyle.surfaceMuted,
+                        in: RoundedRectangle(cornerRadius: 9, style: .continuous))
+            .overlay {
+                if bordered {
+                    RoundedRectangle(cornerRadius: 9, style: .continuous)
+                        .strokeBorder(EasyLockStyle.border, lineWidth: 1)
+                }
+            }
+            .contentShape(RoundedRectangle(cornerRadius: 9, style: .continuous))
+    }
+}
+
+extension View {
+    func iconControl(size: CGFloat = 30, bordered: Bool = true) -> some View {
+        modifier(IconControl(size: size, bordered: bordered))
+    }
+}
+
 struct PageHeading: View {
     let title: String
     let subtitle: String
@@ -336,8 +364,8 @@ struct PageHeading: View {
             IconMedallion(symbol: symbol, size: 40)
             VStack(alignment: .leading, spacing: 4) {
                 Text(title)
-                    .font(.system(size: 22, weight: .semibold))
-                    .tracking(-0.45)
+                    .font(.system(size: 24, weight: .semibold))
+                    .tracking(-0.5)
                 Text(subtitle)
                     .font(.system(size: 11.5))
                     .foregroundStyle(.secondary)

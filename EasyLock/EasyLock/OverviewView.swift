@@ -52,10 +52,10 @@ struct OverviewView: View {
         HStack(alignment: .center, spacing: 14) {
             VStack(alignment: .leading, spacing: 5) {
                 Text("概览")
-                    .font(.system(size: 26, weight: .semibold))
-                    .tracking(-0.6)
+                    .font(.system(size: 24, weight: .semibold))
+                    .tracking(-0.5)
                 Text("本机保险箱的状态、检查项和最近记录")
-                    .font(.system(size: 12))
+                    .font(.system(size: 11.5))
                     .foregroundStyle(EasyLockStyle.secondary)
                     .fixedSize(horizontal: false, vertical: true)
             }
@@ -72,24 +72,22 @@ struct OverviewView: View {
             .background(EasyLockStyle.successSoft, in: Capsule())
             .overlay { Capsule().strokeBorder(EasyLockStyle.success.opacity(0.18), lineWidth: 1) }
 
-            Menu {
-                Button("添加文件…") { store.chooseSources() }
-                Button("添加文件夹…") { store.chooseSources(foldersOnly: true) }
-                Divider()
-                Button("导入已有密文…") { store.importFiles() }
-            } label: {
-                Image(systemName: "ellipsis")
-                    .font(.system(size: 12, weight: .semibold))
-                    .foregroundStyle(EasyLockStyle.secondary)
-                    .frame(width: 32, height: 32)
-                    .background(EasyLockStyle.surface, in: RoundedRectangle(cornerRadius: 9, style: .continuous))
-                    .overlay {
-                        RoundedRectangle(cornerRadius: 9, style: .continuous)
-                            .strokeBorder(EasyLockStyle.border, lineWidth: 1)
-                    }
+            ZStack {
+                Menu {
+                    Button("添加文件…") { store.chooseSources() }
+                    Button("添加文件夹…") { store.chooseSources(foldersOnly: true) }
+                    Divider()
+                    Button("导入已有密文…") { store.importFiles() }
+                } label: {
+                    Image(systemName: "ellipsis")
+                        .font(.system(size: 12, weight: .semibold))
+                        .foregroundStyle(EasyLockStyle.blueDeep)
+                        .frame(width: 32, height: 32)
+                }
+                .menuStyle(.borderlessButton)
+                .menuIndicator(.hidden)
             }
-            .menuStyle(.borderlessButton)
-            .menuIndicator(.hidden)
+            .iconControl(size: 32)
             .fixedSize()
             .disabled(!store.canPresentPicker || store.busy)
             .help("更多添加方式")
