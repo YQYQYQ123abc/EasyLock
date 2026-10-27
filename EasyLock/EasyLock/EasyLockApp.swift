@@ -9,7 +9,7 @@ struct EasyLockApp: App {
             ContentView(store: store)
                 .modifier(MainWindowRegistration(delegate: appDelegate, preview: store.preview))
         }
-        .defaultSize(width: 1180, height: 880)
+        .defaultSize(width: 1180, height: 820)
         .windowToolbarStyle(.unified(showsTitle: false))
         .commands {
             CommandGroup(replacing: .newItem) {

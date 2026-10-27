@@ -8,22 +8,37 @@ struct OverviewView: View {
     let openSecurity: () -> Void
     let openItem: (LockedItem) -> Void
 
+    private let sideColumnWidth: CGFloat = 288
+    private let rowHeight: CGFloat = 238
+
     var body: some View {
         ScrollView {
-            VStack(alignment: .leading, spacing: 14) {
+            VStack(alignment: .leading, spacing: 16) {
                 header
+
                 if !store.recoveries.isEmpty || !store.recoveryErrors.isEmpty {
                     recoveryBanner
                 }
+
+                metricRow
+
                 HStack(alignment: .top, spacing: 16) {
                     heroCard
-                    metricGrid.frame(width: 318)
-                }
-                HStack(alignment: .top, spacing: 16) {
+                        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
                     securityCard
-                    activityCard
+                        .frame(width: sideColumnWidth)
+                        .frame(maxHeight: .infinity, alignment: .topLeading)
                 }
-                recentCard
+                .frame(height: rowHeight)
+
+                HStack(alignment: .top, spacing: 16) {
+                    recentCard
+                        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
+                    activityCard
+                        .frame(width: sideColumnWidth)
+                        .frame(maxHeight: .infinity, alignment: .topLeading)
+                }
+                .frame(height: rowHeight)
             }
             .padding(24)
         }
@@ -85,46 +100,126 @@ struct OverviewView: View {
             .buttonStyle(BrandPrimaryButtonStyle())
             .disabled(!store.canPresentPicker || store.busy)
         }
-        .padding(.bottom, 18)
+        .padding(.bottom, 2)
+    }
+
+    // MARK: - Metrics
+
+    private var metricRow: some View {
+        HStack(spacing: 12) {
+            metricCard(title: "加密文件",
+                       value: "\(store.items.count)",
+                       unit: "项",
+                       detail: "本机记录",
+                       symbol: "lock.doc",
+                       tint: EasyLockStyle.blue,
+                       soft: EasyLockStyle.blueSoft)
+                .frame(maxWidth: .infinity)
+            metricCard(title: "密文大小",
+                       value: sizeValue,
+                       unit: sizeUnit,
+                       detail: "全部密文",
+                       symbol: "internaldrive",
+                       tint: EasyLockStyle.blue,
+                       soft: EasyLockStyle.blueSoft,
+                       valueSize: 21)
+                .frame(maxWidth: .infinity)
+            metricCard(title: "需检查",
+                       value: "\(attentionCount)",
+                       unit: "项",
+                       detail: attentionCount == 0 ? "暂无异常" : "请检查记录",
+                       symbol: "exclamationmark.triangle.fill",
+                       tint: attentionCount == 0 ? EasyLockStyle.success : EasyLockStyle.warning,
+                       soft: attentionCount == 0 ? EasyLockStyle.successSoft : EasyLockStyle.warningSoft)
+                .frame(width: sideColumnWidth)
+        }
+        .frame(height: 102)
+    }
+
+    private func metricCard(title: String,
+                            value: String,
+                            unit: String? = nil,
+                            detail: String,
+                            symbol: String,
+                            tint: Color,
+                            soft: Color,
+                            valueSize: CGFloat = 23) -> some View {
+        VStack(alignment: .leading, spacing: 6) {
+            HStack(spacing: 6) {
+                Image(systemName: symbol)
+                    .font(.system(size: 10, weight: .semibold))
+                    .foregroundStyle(tint)
+                    .frame(width: 20, height: 20)
+                    .background(soft, in: RoundedRectangle(cornerRadius: 6, style: .continuous))
+                Text(title)
+                    .font(.system(size: 9.5, weight: .medium))
+                    .foregroundStyle(.secondary)
+                Spacer(minLength: 0)
+            }
+            HStack(alignment: .firstTextBaseline, spacing: 3) {
+                Text(value)
+                    .font(.system(size: valueSize, weight: .semibold))
+                    .tracking(-0.35)
+                    .monospacedDigit()
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.72)
+                if let unit {
+                    Text(unit)
+                        .font(.system(size: 9.5, weight: .medium))
+                        .foregroundStyle(.secondary)
+                }
+            }
+            Text(detail)
+                .font(.system(size: 9))
+                .foregroundStyle(EasyLockStyle.tertiary)
+                .lineLimit(1)
+        }
+        .padding(13)
+        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
+        .background { GlassPanel(radius: 18) }
     }
 
     // MARK: - Hero
 
     private var heroCard: some View {
-        VStack(alignment: .leading, spacing: 14) {
-            HStack(spacing: 12) {
-                IconMedallion(symbol: "lock.shield", size: 40)
+        VStack(alignment: .leading, spacing: 12) {
+            HStack(alignment: .center, spacing: 11) {
+                IconMedallion(symbol: "lock.shield", size: 38)
                 VStack(alignment: .leading, spacing: 2) {
                     Text("本机保险箱")
-                        .font(.system(size: 15, weight: .semibold))
+                        .font(.system(size: 14.5, weight: .semibold))
                     Text("所有加密、预览与恢复都在本机完成")
-                        .font(.system(size: 10.5))
+                        .font(.system(size: 10))
                         .foregroundStyle(.secondary)
+                        .lineLimit(1)
                 }
-                Spacer(minLength: 8)
+                Spacer(minLength: 6)
             }
 
-            HStack(alignment: .bottom, spacing: 18) {
-                VStack(alignment: .leading, spacing: 5) {
+            HStack(alignment: .center, spacing: 14) {
+                VStack(alignment: .leading, spacing: 4) {
                     HStack(alignment: .firstTextBaseline, spacing: 4) {
                         Text("\(store.items.count)")
                             .font(.system(size: 40, weight: .semibold))
                             .tracking(-1.2)
                             .monospacedDigit()
                         Text("项")
-                            .font(.system(size: 12, weight: .medium))
+                            .font(.system(size: 11, weight: .medium))
                             .foregroundStyle(.secondary)
                     }
                     Text("加密记录 · \(totalSize)")
-                        .font(.system(size: 11))
+                        .font(.system(size: 10.5))
                         .foregroundStyle(.secondary)
                     Text(store.items.isEmpty ? "还没有加密文件" : "最近登记于 \(latestDate)")
-                        .font(.system(size: 10))
+                        .font(.system(size: 9.5))
                         .foregroundStyle(EasyLockStyle.tertiary)
                 }
-                Spacer(minLength: 8)
-                SecurityRing(completed: completedChecks, total: checks.count, size: 88)
+                .frame(maxWidth: .infinity, alignment: .leading)
+
+                SecurityRing(completed: completedChecks, total: checks.count, size: 84)
             }
+
+            Spacer(minLength: 0)
 
             HStack(spacing: 9) {
                 Button { store.chooseSources() } label: {
@@ -144,106 +239,24 @@ struct OverviewView: View {
                     .buttonStyle(BrandGhostButtonStyle())
             }
         }
-        .padding(22)
-        .frame(maxWidth: .infinity, alignment: .leading)
+        .padding(18)
+        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
         .background {
             ZStack(alignment: .bottomTrailing) {
                 GlassPanel(radius: 22)
                 ShieldShape()
-                    .stroke(EasyLockStyle.blue.opacity(0.065), lineWidth: 1.4)
-                    .frame(width: 270, height: 300)
-                    .offset(x: 64, y: 92)
+                    .stroke(EasyLockStyle.blue.opacity(0.055), lineWidth: 1.4)
+                    .frame(width: 250, height: 276)
+                    .offset(x: 64, y: 84)
             }
             .clipShape(RoundedRectangle(cornerRadius: 22, style: .continuous))
         }
     }
 
-    private var metricGrid: some View {
-        VStack(spacing: 12) {
-            HStack(spacing: 12) {
-                metricCard(title: "加密文件",
-                           value: "\(store.items.count)",
-                           unit: "项",
-                           detail: "本机记录",
-                           symbol: "lock.doc",
-                           tint: EasyLockStyle.blue,
-                           soft: EasyLockStyle.blueSoft)
-                metricCard(title: "密文大小",
-                           value: sizeValue,
-                           unit: sizeUnit,
-                           detail: "全部密文",
-                           symbol: "internaldrive",
-                           tint: EasyLockStyle.blue,
-                           soft: EasyLockStyle.blueSoft,
-                           valueSize: 22)
-            }
-            HStack(spacing: 12) {
-                metricCard(title: "恢复密钥",
-                           value: store.recoveryPublicKey == nil ? "未启用" : "已启用",
-                           detail: store.recoveryPublicKey == nil ? "建议创建" : "新文件可恢复",
-                           symbol: "key.fill",
-                           tint: store.recoveryPublicKey == nil ? EasyLockStyle.warning : EasyLockStyle.success,
-                           soft: store.recoveryPublicKey == nil ? EasyLockStyle.warningSoft : EasyLockStyle.successSoft,
-                           valueSize: 16)
-                metricCard(title: "需检查",
-                           value: "\(attentionCount)",
-                           unit: "项",
-                           detail: attentionCount == 0 ? "暂无异常" : "请检查记录",
-                           symbol: "exclamationmark.triangle.fill",
-                           tint: attentionCount == 0 ? EasyLockStyle.success : EasyLockStyle.warning,
-                           soft: attentionCount == 0 ? EasyLockStyle.successSoft : EasyLockStyle.warningSoft)
-            }
-        }
-    }
-
-    private func metricCard(title: String,
-                            value: String,
-                            unit: String? = nil,
-                            detail: String,
-                            symbol: String,
-                            tint: Color,
-                            soft: Color,
-                            valueSize: CGFloat = 24) -> some View {
-        VStack(alignment: .leading, spacing: 8) {
-            HStack(spacing: 6) {
-                Image(systemName: symbol)
-                    .font(.system(size: 10, weight: .semibold))
-                    .foregroundStyle(tint)
-                    .frame(width: 21, height: 21)
-                    .background(soft, in: RoundedRectangle(cornerRadius: 6, style: .continuous))
-                Text(title)
-                    .font(.system(size: 10, weight: .medium))
-                    .foregroundStyle(.secondary)
-                Spacer(minLength: 0)
-            }
-            Spacer(minLength: 0)
-            HStack(alignment: .firstTextBaseline, spacing: 3) {
-                Text(value)
-                    .font(.system(size: valueSize, weight: .semibold))
-                    .tracking(-0.4)
-                    .monospacedDigit()
-                    .lineLimit(1)
-                    .minimumScaleFactor(0.75)
-                if let unit {
-                    Text(unit)
-                        .font(.system(size: 9.5, weight: .medium))
-                        .foregroundStyle(.secondary)
-                }
-            }
-            Text(detail)
-                .font(.system(size: 9.5))
-                .foregroundStyle(EasyLockStyle.tertiary)
-                .lineLimit(1)
-        }
-        .padding(14)
-        .frame(maxWidth: .infinity, minHeight: 106, alignment: .topLeading)
-        .background { GlassPanel(radius: 18) }
-    }
-
     // MARK: - Security
 
     private var securityCard: some View {
-        VStack(alignment: .leading, spacing: 13) {
+        VStack(alignment: .leading, spacing: 8) {
             HStack(spacing: 8) {
                 Image(systemName: "checkmark.shield")
                     .font(.system(size: 11, weight: .semibold))
@@ -260,58 +273,60 @@ struct OverviewView: View {
             }
 
             Text("仅汇总本机设置，不代表独立安全审计")
-                .font(.system(size: 9))
+                .font(.system(size: 8.5))
                 .foregroundStyle(EasyLockStyle.tertiary)
 
-            VStack(spacing: 2) {
+            VStack(spacing: 1) {
                 ForEach(checks) { check in
                     Button { openSecurity() } label: {
-                        HStack(spacing: 10) {
+                        HStack(spacing: 8) {
                             Image(systemName: check.done ? "checkmark" : "exclamationmark")
-                                .font(.system(size: 8, weight: .bold))
+                                .font(.system(size: 7.5, weight: .bold))
                                 .foregroundStyle(check.done ? EasyLockStyle.success : EasyLockStyle.warning)
-                                .frame(width: 22, height: 22)
+                                .frame(width: 19, height: 19)
                                 .background(check.done ? EasyLockStyle.successSoft : EasyLockStyle.warningSoft, in: Circle())
-                            VStack(alignment: .leading, spacing: 2) {
+                            VStack(alignment: .leading, spacing: 1) {
                                 Text(check.title)
-                                    .font(.system(size: 11.5, weight: .medium))
+                                    .font(.system(size: 10.5, weight: .medium))
                                     .foregroundStyle(EasyLockStyle.ink)
                                 Text(check.detail)
-                                    .font(.system(size: 9.5))
+                                    .font(.system(size: 8.5))
                                     .foregroundStyle(.secondary)
                                     .lineLimit(1)
                             }
-                            Spacer(minLength: 6)
+                            Spacer(minLength: 4)
                             Image(systemName: "chevron.right")
-                                .font(.system(size: 8, weight: .semibold))
+                                .font(.system(size: 7.5, weight: .semibold))
                                 .foregroundStyle(EasyLockStyle.tertiary)
                         }
-                        .padding(.horizontal, 7)
-                        .padding(.vertical, 3)
+                        .padding(.horizontal, 5)
+                        .padding(.vertical, 2)
                         .contentShape(Rectangle())
                     }
                     .buttonStyle(.plain)
                 }
             }
-
+            Spacer(minLength: 0)
             Button { openSecurity() } label: {
                 HStack(spacing: 5) {
-                    Text(completedChecks == checks.count ? "查看安全设置" : "完成剩余检查项")
+                    Text("管理安全设置")
+                    Spacer(minLength: 0)
                     Image(systemName: "arrow.right").font(.system(size: 8, weight: .semibold))
                 }
+                .frame(maxWidth: .infinity, alignment: .leading)
             }
             .buttonStyle(BrandGhostButtonStyle())
             .padding(.leading, -6)
         }
-        .padding(18)
-        .frame(maxWidth: .infinity, alignment: .leading)
+        .padding(16)
+        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
         .background { GlassPanel(radius: 22) }
     }
 
     // MARK: - Activity
 
     private var activityCard: some View {
-        VStack(alignment: .leading, spacing: 14) {
+        VStack(alignment: .leading, spacing: 8) {
             HStack(spacing: 8) {
                 Image(systemName: "chart.bar.xaxis")
                     .font(.system(size: 11, weight: .semibold))
@@ -320,7 +335,7 @@ struct OverviewView: View {
                     .font(.system(size: 12, weight: .semibold))
                 Spacer(minLength: 6)
                 Text("\(weekTotal) 项")
-                    .font(.system(size: 9.5, weight: .semibold))
+                    .font(.system(size: 9, weight: .semibold))
                     .foregroundStyle(EasyLockStyle.blueDeep)
                     .padding(.horizontal, 7)
                     .padding(.vertical, 3)
@@ -329,7 +344,7 @@ struct OverviewView: View {
 
             HStack(alignment: .bottom, spacing: 8) {
                 ForEach(Array(weekDays.enumerated()), id: \.offset) { index, day in
-                    VStack(spacing: 6) {
+                    VStack(spacing: 5) {
                         Spacer(minLength: 0)
                         RoundedRectangle(cornerRadius: 5, style: .continuous)
                             .fill(index == weekDays.count - 1
@@ -338,33 +353,34 @@ struct OverviewView: View {
                                   : AnyShapeStyle(EasyLockStyle.blue.opacity(day.count > 0 ? 0.30 : 0.12)))
                             .frame(height: barHeight(day.count))
                         Text(day.label)
-                            .font(.system(size: 8.5, weight: index == weekDays.count - 1 ? .semibold : .regular))
+                            .font(.system(size: 8, weight: index == weekDays.count - 1 ? .semibold : .regular))
                             .foregroundStyle(index == weekDays.count - 1 ? EasyLockStyle.blueDeep : EasyLockStyle.tertiary)
                     }
                     .frame(maxWidth: .infinity)
                 }
             }
-            .frame(height: 96, alignment: .bottom)
+            .frame(height: 128, alignment: .bottom)
             .padding(.top, 2)
+            Spacer(minLength: 0)
 
-            HStack(spacing: 6) {
+            HStack(spacing: 5) {
                 Image(systemName: "internaldrive")
-                    .font(.system(size: 9))
+                    .font(.system(size: 8.5))
                 Text("来自本机登记记录，不上传")
-                    .font(.system(size: 9))
+                    .font(.system(size: 8.5))
                 Spacer(minLength: 0)
             }
             .foregroundStyle(EasyLockStyle.tertiary)
         }
-        .padding(18)
-        .frame(maxWidth: .infinity, alignment: .leading)
+        .padding(16)
+        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
         .background { GlassPanel(radius: 22) }
     }
 
     private func barHeight(_ count: Int) -> CGFloat {
         let maxCount = max(1, weekDays.map(\.count).max() ?? 0)
         guard count > 0 else { return 4 }
-        return max(8, CGFloat(count) / CGFloat(maxCount) * 76)
+        return max(8, CGFloat(count) / CGFloat(maxCount) * 88)
     }
 
     // MARK: - Recent files
@@ -381,50 +397,50 @@ struct OverviewView: View {
                 Button("查看全部") { openLibrary() }
                     .buttonStyle(BrandGhostButtonStyle())
             }
-            .padding(.bottom, 8)
+            .padding(.bottom, 4)
 
             if recentItems.isEmpty {
-                HStack(spacing: 12) {
+                HStack(spacing: 10) {
                     Image(systemName: "tray")
-                        .font(.system(size: 18, weight: .light))
+                        .font(.system(size: 16, weight: .light))
                         .foregroundStyle(EasyLockStyle.tertiary)
                     VStack(alignment: .leading, spacing: 2) {
                         Text("还没有加密记录")
-                            .font(.system(size: 11.5, weight: .medium))
+                            .font(.system(size: 11, weight: .medium))
                         Text("添加文件后，这里会显示最近的记录。")
-                            .font(.system(size: 9.5))
+                            .font(.system(size: 9))
                             .foregroundStyle(.secondary)
                     }
-                    Spacer(minLength: 8)
+                    Spacer(minLength: 4)
                     Button { store.chooseSources() } label: {
                         Label("添加文件", systemImage: "plus")
                     }
                     .buttonStyle(BrandSecondaryButtonStyle())
                     .disabled(!store.canPresentPicker || store.busy)
                 }
-                .padding(.vertical, 14)
+                .padding(.vertical, 13)
             } else {
                 ForEach(recentItems) { item in
                     Button { openItem(item) } label: {
-                        HStack(spacing: 12) {
-                            FileBadge(name: item.name, locked: true, size: 32)
-                            VStack(alignment: .leading, spacing: 2) {
+                        HStack(spacing: 10) {
+                            FileBadge(name: item.name, locked: true, size: 28)
+                            VStack(alignment: .leading, spacing: 1) {
                                 Text(item.name)
-                                    .font(.system(size: 11.5, weight: .medium))
+                                    .font(.system(size: 10.5, weight: .medium))
                                     .lineLimit(1)
                                     .truncationMode(.middle)
                                 Text("\(shortDate(item.date)) · \(ByteCountFormatter.string(fromByteCount: Int64(item.size), countStyle: .file))")
-                                    .font(.system(size: 9))
+                                    .font(.system(size: 8.5))
                                     .foregroundStyle(EasyLockStyle.tertiary)
                             }
-                            Spacer(minLength: 8)
+                            Spacer(minLength: 6)
                             FileStatusPill(locked: true,
                                            needsAttention: item.warning != nil || item.originalRetained)
                             Image(systemName: "chevron.right")
-                                .font(.system(size: 8, weight: .semibold))
+                                .font(.system(size: 7.5, weight: .semibold))
                                 .foregroundStyle(EasyLockStyle.tertiary)
                         }
-                        .padding(.vertical, 9)
+                        .padding(.vertical, 5)
                         .contentShape(Rectangle())
                     }
                     .buttonStyle(.plain)
@@ -433,29 +449,30 @@ struct OverviewView: View {
                     }
                 }
             }
+            Spacer(minLength: 0)
         }
-        .padding(18)
-        .frame(maxWidth: .infinity, alignment: .leading)
+        .padding(16)
+        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
         .background { GlassPanel(radius: 22) }
     }
 
     private var recoveryBanner: some View {
-        HStack(spacing: 10) {
+        HStack(spacing: 9) {
             Image(systemName: "arrow.counterclockwise.circle.fill")
-                .font(.system(size: 12, weight: .semibold))
+                .font(.system(size: 11, weight: .semibold))
                 .foregroundStyle(EasyLockStyle.warning)
             Text("有未完成的恢复任务需要检查")
-                .font(.system(size: 11, weight: .medium))
+                .font(.system(size: 10.5, weight: .medium))
                 .foregroundStyle(EasyLockStyle.warning)
             Spacer(minLength: 8)
             Button("检查") { openSecurity() }
                 .buttonStyle(BrandGhostButtonStyle())
         }
-        .padding(.horizontal, 13)
-        .padding(.vertical, 9)
-        .background(EasyLockStyle.warningSoft, in: RoundedRectangle(cornerRadius: 11, style: .continuous))
+        .padding(.horizontal, 12)
+        .padding(.vertical, 7)
+        .background(EasyLockStyle.warningSoft, in: RoundedRectangle(cornerRadius: 10, style: .continuous))
         .overlay {
-            RoundedRectangle(cornerRadius: 11, style: .continuous)
+            RoundedRectangle(cornerRadius: 10, style: .continuous)
                 .strokeBorder(EasyLockStyle.warning.opacity(0.22), lineWidth: 1)
         }
     }
@@ -527,7 +544,6 @@ struct OverviewView: View {
     }
 
     private var completedChecks: Int { checks.filter(\.done).count }
-
     private var weekTotal: Int { weekDays.reduce(0) { $0 + $1.count } }
 
     private struct WeekDay {
@@ -559,7 +575,7 @@ struct OverviewView: View {
 private struct SecurityRing: View {
     let completed: Int
     let total: Int
-    var size: CGFloat = 100
+    var size: CGFloat = 84
 
     private var progress: CGFloat {
         guard total > 0 else { return 0 }

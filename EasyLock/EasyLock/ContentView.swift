@@ -68,12 +68,15 @@ struct ContentView: View {
             if store.password.isEmpty {
                 welcome.onDrop(of: [UTType.fileURL], isTargeted: $dropTargeted) { store.acceptDrop($0) }
             } else {
-                NavigationSplitView {
+                HStack(spacing: 0) {
                     sidebar
-                } detail: {
+                        .frame(width: 236)
+                    Rectangle()
+                        .fill(EasyLockStyle.sidebarLine)
+                        .frame(width: 1)
                     workspaceDetail
+                        .frame(maxWidth: .infinity, maxHeight: .infinity)
                 }
-                .navigationSplitViewStyle(.balanced)
             }
         }
         .background { WorkspaceBackground() }
@@ -115,21 +118,6 @@ struct ContentView: View {
         .tint(accent)
         .groupBoxStyle(BrandGroupBoxStyle())
         .frame(minWidth: 1040, minHeight: 700)
-        .toolbar {
-            ToolbarItemGroup(placement: .primaryAction) {
-                Button { showHelp = true } label: { Label("使用帮助", systemImage: "questionmark.circle") }
-                    .disabled(store.busy)
-                if !store.password.isEmpty {
-                    Button { store.lockSession(); input = ""; confirmation = "" } label: { Label("锁定应用", systemImage: "lock") }
-                        .disabled(store.busy)
-                }
-            }
-        }
-        .background {
-            SidebarToggleHider()
-                .frame(width: 1, height: 1)
-                .allowsHitTesting(false)
-        }
         .safeAreaInset(edge: .bottom, spacing: 0) {
             if store.busy {
                 VStack(alignment: .leading, spacing: 8) {
@@ -270,7 +258,6 @@ struct ContentView: View {
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .leading)
         .background(EasyLockStyle.sidebar)
-        .navigationSplitViewColumnWidth(min: 218, ideal: 236, max: 272)
     }
 
     private func sidebarGroup(_ title: String, items: [Section]) -> some View {
@@ -335,23 +322,41 @@ struct ContentView: View {
                     .font(.system(size: 10.5, weight: .medium))
                     .foregroundStyle(EasyLockStyle.ink)
                 Spacer(minLength: 4)
-                Button {
-                    store.lockSession(); input = ""; confirmation = ""
-                } label: {
-                    Image(systemName: "lock")
-                        .font(.system(size: 10, weight: .semibold))
-                        .foregroundStyle(EasyLockStyle.sidebarText)
-                        .frame(width: 24, height: 24)
-                        .background(EasyLockStyle.surface, in: RoundedRectangle(cornerRadius: 7, style: .continuous))
-                        .overlay {
-                            RoundedRectangle(cornerRadius: 7, style: .continuous)
-                                .strokeBorder(EasyLockStyle.sidebarLine, lineWidth: 1)
-                        }
+                HStack(spacing: 4) {
+                    Button { showHelp = true } label: {
+                        Image(systemName: "questionmark")
+                            .font(.system(size: 10, weight: .semibold))
+                            .foregroundStyle(EasyLockStyle.sidebarText)
+                            .frame(width: 24, height: 24)
+                            .background(EasyLockStyle.surface, in: RoundedRectangle(cornerRadius: 7, style: .continuous))
+                            .overlay {
+                                RoundedRectangle(cornerRadius: 7, style: .continuous)
+                                    .strokeBorder(EasyLockStyle.sidebarLine, lineWidth: 1)
+                            }
+                    }
+                    .buttonStyle(.plain)
+                    .disabled(store.busy)
+                    .help("使用帮助")
+                    .accessibilityLabel("使用帮助")
+
+                    Button {
+                        store.lockSession(); input = ""; confirmation = ""
+                    } label: {
+                        Image(systemName: "lock")
+                            .font(.system(size: 10, weight: .semibold))
+                            .foregroundStyle(EasyLockStyle.sidebarText)
+                            .frame(width: 24, height: 24)
+                            .background(EasyLockStyle.surface, in: RoundedRectangle(cornerRadius: 7, style: .continuous))
+                            .overlay {
+                                RoundedRectangle(cornerRadius: 7, style: .continuous)
+                                    .strokeBorder(EasyLockStyle.sidebarLine, lineWidth: 1)
+                            }
+                    }
+                    .buttonStyle(.plain)
+                    .disabled(store.busy)
+                    .help("锁定应用")
+                    .accessibilityLabel("锁定应用")
                 }
-                .buttonStyle(.plain)
-                .disabled(store.busy)
-                .help("锁定应用")
-                .accessibilityLabel("锁定应用")
             }
             Text(store.autoLockMinutes == 0 ? "不按闲置时间自动锁定" : "闲置 \(store.autoLockMinutes) 分钟后自动锁定")
                 .font(.system(size: 9.5))
@@ -2048,46 +2053,6 @@ struct ContentView: View {
         .onDisappear {
             decryptPassword = ""; recoveryInput = ""; restoreFolder = nil
             restoreElsewhere = false; useRecovery = false; didRequestDecryptionTouchID = false
-        }
-    }
-}
-
-/// Hides the system sidebar toggle so the light sidebar header stays clean.
-/// Navigation remains available from the sidebar itself.
-private struct SidebarToggleHider: NSViewRepresentable {
-    func makeNSView(context: Context) -> NSView { HiderView() }
-    func updateNSView(_ view: NSView, context: Context) { (view as? HiderView)?.hideToggle() }
-
-    final class HiderView: NSView {
-        private var observers: [NSObjectProtocol] = []
-
-        override func viewDidMoveToWindow() {
-            super.viewDidMoveToWindow()
-            guard let window else { return }
-            hideToggle()
-            DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) { [weak self] in self?.hideToggle() }
-            if observers.isEmpty {
-                let center = NotificationCenter.default
-                for name in [NSWindow.didBecomeKeyNotification,
-                             NSWindow.didEnterFullScreenNotification,
-                             NSWindow.didExitFullScreenNotification] {
-                    observers.append(center.addObserver(forName: name, object: window, queue: .main) { [weak self] _ in
-                        self?.hideToggle()
-                    })
-                }
-            }
-        }
-
-        func hideToggle() {
-            guard let toolbar = window?.toolbar else { return }
-            for index in toolbar.items.indices.reversed()
-            where toolbar.items[index].itemIdentifier.rawValue.contains("toggleSidebar") {
-                toolbar.removeItem(at: index)
-            }
-        }
-
-        deinit {
-            for observer in observers { NotificationCenter.default.removeObserver(observer) }
         }
     }
 }
