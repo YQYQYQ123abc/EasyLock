@@ -31,10 +31,10 @@ struct LocalPreviewView: View {
                     VStack(spacing: 16) {
                         ZStack {
                             RoundedRectangle(cornerRadius: 26, style: .continuous)
-                                .fill(EasyLockStyle.surfaceMuted)
+                                .fill(EasyLockStyle.blueSoft)
                                 .overlay {
                                     RoundedRectangle(cornerRadius: 26, style: .continuous)
-                                        .strokeBorder(EasyLockStyle.border, lineWidth: 1)
+                                        .strokeBorder(EasyLockStyle.blue.opacity(0.16), lineWidth: 1)
                                 }
                                 .overlay {
                                     RoundedRectangle(cornerRadius: 25, style: .continuous)
@@ -44,7 +44,7 @@ struct LocalPreviewView: View {
                                 .shadow(color: .black.opacity(0.08), radius: 10, y: 4)
                             Image(systemName: "folder")
                                 .font(.system(size: 48, weight: .light))
-                                .foregroundStyle(EasyLockStyle.ink.opacity(0.7))
+                                .foregroundStyle(EasyLockStyle.blueDeep.opacity(0.8))
                         }
                         .frame(width: 112, height: 112)
 

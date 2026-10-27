@@ -13,34 +13,46 @@ enum EasyLockStyle {
         })
     }
 
-    // Core ramp
-    static let ink = adaptive(0x111113, 0xF6F6F2)
-    static let accent = ink
-    static let secondary = adaptive(0x5F5F63, 0xACACB2)
-    static let tertiary = adaptive(0x797975, 0x8B8B92)
+    // Signal blue is the only saturated hue; it carries focus, charts and actions.
+    static let blue = adaptive(0x2563EB, 0x5B8DEF)
+    static let blueDeep = adaptive(0x1D4ED8, 0x7EA8FF)
+    static let blueSoft = adaptive(0xEFF4FF, 0x18253D)
+    static let blueTint = adaptive(0xDBEAFE, 0x203553)
+    static let accent = blue
 
-    static let background = adaptive(0xF4F4F0, 0x09090A)
-    static let surface = adaptive(0xFFFFFF, 0x141416)
-    static let surfaceRaised = adaptive(0xFAFAF7, 0x19191C)
-    static let surfaceMuted = adaptive(0xF0F0EB, 0x1E1E21)
-    static let border = adaptive(0xE3E3DC, 0x2A2A2E)
-    static let borderStrong = adaptive(0xCBCBC4, 0x3C3C41)
+    // Neutral ramp
+    static let ink = adaptive(0x101828, 0xF2F4F7)
+    static let secondary = adaptive(0x667085, 0x98A2B3)
+    static let tertiary = adaptive(0x98A2B3, 0x667085)
+
+    static let background = adaptive(0xEFF2F7, 0x090B10)
+    static let surface = adaptive(0xFFFFFF, 0x15171C)
+    static let surfaceRaised = adaptive(0xF8FAFC, 0x1A1D23)
+    static let surfaceMuted = adaptive(0xF2F4F7, 0x20242B)
+    static let border = adaptive(0xE4E7EC, 0x282C34)
+    static let borderStrong = adaptive(0xD0D5DD, 0x353A44)
 
     // Controls
-    static let buttonFill = ink
-    static let buttonText = adaptive(0xFFFFFF, 0x0A0A0B)
-    static let warning = adaptive(0xA66A0C, 0xE2B35E)
-    static let danger = adaptive(0xAC382D, 0xE58377)
+    static let buttonFill = blue
+    static let buttonText = Color.white
+    static let success = adaptive(0x12B76A, 0x32D583)
+    static let successSoft = adaptive(0xECFDF3, 0x10261A)
+    static let warning = adaptive(0xB54708, 0xFDB022)
+    static let warningSoft = adaptive(0xFFFAEB, 0x251D0E)
+    static let danger = adaptive(0xB42318, 0xF97066)
+    static let dangerSoft = adaptive(0xFEF3F2, 0x2A1715)
 
-    // The sidebar is ink in both appearances, like the dark app icon.
-    static let sidebar = Color(red: 0.043, green: 0.043, blue: 0.049)
-    static let sidebarLine = Color.white.opacity(0.075)
-    static let sidebarText = Color.white.opacity(0.64)
-    static let sidebarDim = Color.white.opacity(0.40)
-    static let sidebarSelectedText = Color(red: 0.05, green: 0.05, blue: 0.06)
+    // Light-first sidebar, still dark in dark appearance.
+    static let sidebar = adaptive(0xF7F9FC, 0x0B0D12)
+    static let sidebarLine = adaptive(0xE4E7EC, 0x22262E)
+    static let sidebarText = adaptive(0x475467, 0x9AA3B2)
+    static let sidebarDim = adaptive(0x98A2B3, 0x6B7280)
+    static let sidebarSelectedFill = adaptive(0xE8EFFC, 0x1C2A42)
+    static let sidebarSelectedText = adaptive(0x1D4ED8, 0x9DBBFF)
+    static let sidebarHover = adaptive(0xF0F3F8, 0x171A20)
 
-    static let cardRadius: CGFloat = 18
-    static let controlRadius: CGFloat = 10
+    static let cardRadius: CGFloat = 22
+    static let controlRadius: CGFloat = 11
 }
 
 // MARK: - Brand
@@ -155,8 +167,8 @@ struct GlassPanel: View {
                         .strokeBorder(scheme == .dark ? Color.white.opacity(0.035) : Color.white.opacity(0.85), lineWidth: 1)
                 }
             }
-            .shadow(color: .black.opacity(radius > 0 ? (scheme == .dark ? 0.34 : 0.05) : 0),
-                    radius: radius > 0 ? 16 : 0,
+            .shadow(color: .black.opacity(radius > 0 ? (scheme == .dark ? 0.34 : 0.065) : 0),
+                    radius: radius > 0 ? 18 : 0,
                     y: radius > 0 ? 6 : 0)
     }
 }
@@ -167,7 +179,7 @@ struct VaultBackground: View {
             ZStack {
                 WorkspaceBackground()
                 ShieldShape()
-                    .stroke(EasyLockStyle.ink.opacity(0.032), lineWidth: 1.2)
+                    .stroke(EasyLockStyle.blue.opacity(0.055), lineWidth: 1.2)
                     .frame(width: min(max(geo.size.width * 0.54, 380), 660),
                            height: min(max(geo.size.height * 0.82, 460), 820))
                     .rotationEffect(.degrees(7))
@@ -184,10 +196,10 @@ struct WorkspaceBackground: View {
     var body: some View {
         ZStack {
             EasyLockStyle.background
-            LinearGradient(colors: [Color.white.opacity(scheme == .dark ? 0.045 : 0.70), .clear],
+            RadialGradient(colors: [EasyLockStyle.blue.opacity(scheme == .dark ? 0.10 : 0.05), .clear],
+                           center: .topTrailing, startRadius: 18, endRadius: 680)
+            LinearGradient(colors: [Color.white.opacity(scheme == .dark ? 0.02 : 0.22), .clear],
                            startPoint: .topLeading, endPoint: .center)
-            LinearGradient(colors: [.clear, Color.black.opacity(scheme == .dark ? 0.0 : 0.018)],
-                           startPoint: .center, endPoint: .bottom)
         }
         .ignoresSafeArea()
         .allowsHitTesting(false)
@@ -213,7 +225,7 @@ struct BrandPrimaryButtonStyle: ButtonStyle {
             .overlay {
                 shape.strokeBorder(scheme == .dark ? Color.black.opacity(0.12) : Color.white.opacity(0.12), lineWidth: 1)
             }
-            .shadow(color: .black.opacity(enabled && scheme == .light ? 0.16 : 0), radius: 7, y: 3)
+            .shadow(color: EasyLockStyle.blue.opacity(enabled ? (scheme == .light ? 0.24 : 0.18) : 0), radius: 10, y: 4)
             .opacity(enabled ? (configuration.isPressed ? 0.78 : 1) : 0.36)
     }
 }
@@ -243,7 +255,7 @@ struct BrandGhostButtonStyle: ButtonStyle {
     func makeBody(configuration: Configuration) -> some View {
         configuration.label
             .font(.system(size: 12, weight: .medium))
-            .foregroundStyle(EasyLockStyle.ink.opacity(configuration.isPressed ? 0.55 : 0.82))
+            .foregroundStyle(EasyLockStyle.blueDeep.opacity(configuration.isPressed ? 0.55 : 0.9))
             .padding(.horizontal, 8)
             .padding(.vertical, 6)
             .contentShape(Rectangle())
@@ -277,10 +289,10 @@ private struct FieldSurfaceModifier: ViewModifier {
             .frame(height: height)
             .background(EasyLockStyle.surface, in: shape)
             .overlay {
-                shape.strokeBorder(focused ? EasyLockStyle.ink.opacity(0.62) : EasyLockStyle.border,
+                shape.strokeBorder(focused ? EasyLockStyle.blue.opacity(0.72) : EasyLockStyle.border,
                                    lineWidth: focused ? 1.5 : 1)
             }
-            .shadow(color: .black.opacity(focused ? (scheme == .dark ? 0.28 : 0.06) : 0), radius: 6, y: 2)
+            .shadow(color: EasyLockStyle.blue.opacity(focused ? 0.14 : 0), radius: 7, y: 2)
     }
 }
 
@@ -299,14 +311,14 @@ struct IconMedallion: View {
     var body: some View {
         ZStack {
             RoundedRectangle(cornerRadius: size * 0.29, style: .continuous)
-                .fill(EasyLockStyle.ink)
+                .fill(EasyLockStyle.blueSoft)
                 .overlay {
                     RoundedRectangle(cornerRadius: size * 0.29, style: .continuous)
-                        .strokeBorder(Color.white.opacity(0.10), lineWidth: 1)
+                        .strokeBorder(EasyLockStyle.blue.opacity(0.16), lineWidth: 1)
                 }
             Image(systemName: symbol)
                 .font(.system(size: size * 0.42, weight: .semibold))
-                .foregroundStyle(EasyLockStyle.buttonText)
+                .foregroundStyle(EasyLockStyle.blueDeep)
         }
         .frame(width: size, height: size)
         .accessibilityHidden(true)
@@ -324,8 +336,8 @@ struct PageHeading: View {
             IconMedallion(symbol: symbol, size: 40)
             VStack(alignment: .leading, spacing: 4) {
                 Text(title)
-                    .font(.system(size: 20, weight: .semibold))
-                    .tracking(-0.35)
+                    .font(.system(size: 22, weight: .semibold))
+                    .tracking(-0.45)
                 Text(subtitle)
                     .font(.system(size: 11.5))
                     .foregroundStyle(.secondary)
@@ -404,13 +416,14 @@ struct InlineNotice: View {
                 .fixedSize(horizontal: false, vertical: true)
             Spacer(minLength: 0)
         }
-        .foregroundStyle(kind == .warning ? EasyLockStyle.warning : EasyLockStyle.secondary)
+        .foregroundStyle(kind == .warning ? EasyLockStyle.warning : EasyLockStyle.blueDeep)
         .padding(.horizontal, 12)
         .padding(.vertical, 10)
-        .background(EasyLockStyle.surface, in: RoundedRectangle(cornerRadius: 10, style: .continuous))
+        .background(kind == .warning ? EasyLockStyle.warningSoft : EasyLockStyle.blueSoft,
+                    in: RoundedRectangle(cornerRadius: 10, style: .continuous))
         .overlay {
             RoundedRectangle(cornerRadius: 10, style: .continuous)
-                .strokeBorder(kind == .warning ? EasyLockStyle.warning.opacity(0.28) : EasyLockStyle.border, lineWidth: 1)
+                .strokeBorder((kind == .warning ? EasyLockStyle.warning : EasyLockStyle.blue).opacity(0.22), lineWidth: 1)
         }
     }
 }

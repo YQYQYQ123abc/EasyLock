@@ -402,7 +402,7 @@ struct LocalFilesView: View {
         }
         .padding(.horizontal, 10)
         .padding(.vertical, 6)
-        .background(isSelected ? EasyLockStyle.ink.opacity(0.055) : .clear,
+        .background(isSelected ? EasyLockStyle.blueSoft : .clear,
                     in: RoundedRectangle(cornerRadius: 9, style: .continuous))
         .help(entry.reason ?? entry.url.lastPathComponent)
         .contextMenu { itemMenu(entry) }
