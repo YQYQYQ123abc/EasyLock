@@ -23,10 +23,14 @@ private struct WidgetShield: View {
         ZStack {
             Image(systemName: "shield.fill")
                 .font(.system(size: size, weight: .regular))
-                .foregroundStyle(.white)
+                .foregroundStyle(
+                    LinearGradient(colors: [Color(red: 0.36, green: 0.56, blue: 0.99),
+                                            Color(red: 0.08, green: 0.30, blue: 0.92)],
+                                   startPoint: .topLeading, endPoint: .bottomTrailing)
+                )
             Image(systemName: "lock.fill")
                 .font(.system(size: size * 0.34, weight: .bold))
-                .foregroundStyle(.black.opacity(0.88))
+                .foregroundStyle(.white)
                 .offset(y: size * 0.03)
         }
         .frame(width: size * 0.86, height: size)
@@ -36,6 +40,13 @@ private struct WidgetShield: View {
 struct WidgetContent: View {
     let entry: Entry
     @Environment(\.widgetFamily) private var family
+    @Environment(\.colorScheme) private var scheme
+
+    private var ink: Color { scheme == .dark ? .white : Color(red: 0.063, green: 0.094, blue: 0.157) }
+    private var muted: Color { scheme == .dark ? .white.opacity(0.56) : Color(red: 0.40, green: 0.44, blue: 0.52) }
+    private var faint: Color { scheme == .dark ? .white.opacity(0.34) : Color(red: 0.60, green: 0.64, blue: 0.72) }
+    private var accent: Color { scheme == .dark ? Color(red: 0.62, green: 0.73, blue: 1.0) : Color(red: 0.114, green: 0.333, blue: 0.941) }
+    private var soft: Color { scheme == .dark ? Color(red: 0.09, green: 0.14, blue: 0.23) : Color(red: 0.91, green: 0.95, blue: 1.0) }
 
     var body: some View {
         HStack(spacing: 18) {
@@ -44,7 +55,7 @@ struct WidgetContent: View {
                     WidgetShield(size: 27)
                     Text("EasyLock")
                         .font(.system(size: 13, weight: .semibold))
-                        .foregroundStyle(.white)
+                        .foregroundStyle(ink)
                         .tracking(0.1)
                 }
 
@@ -55,27 +66,27 @@ struct WidgetContent: View {
                         Text("\(count)")
                             .font(.system(size: 34, weight: .semibold))
                             .monospacedDigit()
-                            .foregroundStyle(.white)
+                            .foregroundStyle(ink)
                         Text("项")
                             .font(.system(size: 11, weight: .medium))
-                            .foregroundStyle(.white.opacity(0.45))
+                            .foregroundStyle(muted)
                     }
                     Text("保险箱记录")
                         .font(.system(size: 10))
-                        .foregroundStyle(.white.opacity(0.55))
+                        .foregroundStyle(muted)
                     if let updated = entry.updated {
                         Text(updated, style: .time)
                             .font(.system(size: 9))
-                            .foregroundStyle(.white.opacity(0.32))
+                            .foregroundStyle(faint)
                     }
                 } else {
                     Text("你的文件\n由你上锁")
                         .font(.system(size: 16, weight: .medium))
-                        .foregroundStyle(.white)
+                        .foregroundStyle(ink)
                         .lineSpacing(2)
                     Text("打开 EasyLock")
                         .font(.system(size: 9.5))
-                        .foregroundStyle(.white.opacity(0.5))
+                        .foregroundStyle(muted)
                 }
             }
             .frame(maxWidth: .infinity, alignment: .leading)
@@ -93,11 +104,16 @@ struct WidgetContent: View {
         .widgetURL(URL(string: "easylock://library"))
         .containerBackground(for: .widget) {
             ZStack {
-                Color(red: 0.043, green: 0.043, blue: 0.049)
-                RadialGradient(colors: [Color.white.opacity(0.115), .clear],
-                               center: .topLeading, startRadius: 4, endRadius: 260)
-                LinearGradient(colors: [.clear, Color.black.opacity(0.30)],
-                               startPoint: .center, endPoint: .bottom)
+                if scheme == .dark {
+                    LinearGradient(colors: [Color(red: 0.075, green: 0.098, blue: 0.145),
+                                            Color(red: 0.035, green: 0.043, blue: 0.063)],
+                                   startPoint: .topLeading, endPoint: .bottomTrailing)
+                } else {
+                    LinearGradient(colors: [.white, Color(red: 0.925, green: 0.957, blue: 1.0)],
+                                   startPoint: .topLeading, endPoint: .bottomTrailing)
+                }
+                RadialGradient(colors: [Color(red: 0.114, green: 0.333, blue: 0.941).opacity(scheme == .dark ? 0.20 : 0.10), .clear],
+                               center: .topLeading, startRadius: 4, endRadius: 280)
             }
         }
     }
@@ -112,15 +128,15 @@ struct WidgetContent: View {
                 Spacer(minLength: 0)
                 Image(systemName: "arrow.up.right")
                     .font(.system(size: 7, weight: .bold))
-                    .foregroundStyle(.white.opacity(0.28))
+                    .foregroundStyle(accent.opacity(0.38))
             }
-            .foregroundStyle(.white.opacity(0.78))
+            .foregroundStyle(accent)
             .padding(.horizontal, 9)
             .padding(.vertical, 7)
-            .background(Color.white.opacity(0.065), in: RoundedRectangle(cornerRadius: 7, style: .continuous))
+            .background(soft, in: RoundedRectangle(cornerRadius: 7, style: .continuous))
             .overlay {
                 RoundedRectangle(cornerRadius: 7, style: .continuous)
-                    .strokeBorder(Color.white.opacity(0.08), lineWidth: 1)
+                    .strokeBorder(accent.opacity(0.14), lineWidth: 1)
             }
         }
     }
