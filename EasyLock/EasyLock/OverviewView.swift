@@ -12,7 +12,7 @@ struct OverviewView: View {
 
     var body: some View {
         ScrollView {
-            VStack(alignment: .leading, spacing: 16) {
+            VStack(alignment: .leading, spacing: 24) {
                 header
 
                 if !store.recoveries.isEmpty || !store.recoveryErrors.isEmpty {
@@ -167,7 +167,7 @@ struct OverviewView: View {
         }
         .padding(13)
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
-        .background { GlassPanel(radius: 18) }
+        .background { GlassPanel(radius: 18, shadow: false) }
     }
 
     // MARK: - Hero
@@ -234,7 +234,7 @@ struct OverviewView: View {
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
         .background {
             ZStack(alignment: .bottomTrailing) {
-                GlassPanel(radius: 22)
+                GlassPanel(radius: 22, shadow: false)
                 ShieldShape()
                     .stroke(EasyLockStyle.blue.opacity(0.055), lineWidth: 1.4)
                     .frame(width: 250, height: 276)
@@ -310,7 +310,7 @@ struct OverviewView: View {
         }
         .padding(18)
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
-        .background { GlassPanel(radius: 22) }
+        .background { GlassPanel(radius: 22, shadow: false) }
     }
 
     // MARK: - Activity
@@ -364,7 +364,7 @@ struct OverviewView: View {
         }
         .padding(18)
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
-        .background { GlassPanel(radius: 22) }
+        .background { GlassPanel(radius: 22, shadow: false) }
     }
 
     private func barHeight(_ count: Int) -> CGFloat {
@@ -443,7 +443,7 @@ struct OverviewView: View {
         }
         .padding(18)
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
-        .background { GlassPanel(radius: 22) }
+        .background { GlassPanel(radius: 22, shadow: false) }
     }
 
     private var recoveryBanner: some View {

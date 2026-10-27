@@ -127,6 +127,7 @@ struct BrandMark: View {
 /// `GlassPanel` name so existing call sites remain valid.
 struct GlassPanel: View {
     var radius: CGFloat = 22
+    var shadow: Bool = true
     @Environment(\.colorScheme) private var scheme
 
     var body: some View {
@@ -142,9 +143,9 @@ struct GlassPanel: View {
                         .strokeBorder(scheme == .dark ? Color.white.opacity(0.035) : Color.white.opacity(0.85), lineWidth: 1)
                 }
             }
-            .shadow(color: .black.opacity(radius > 0 ? (scheme == .dark ? 0.28 : 0.045) : 0),
-                    radius: radius > 0 ? 14 : 0,
-                    y: radius > 0 ? 4 : 0)
+            .shadow(color: .black.opacity(shadow && radius > 0 ? (scheme == .dark ? 0.28 : 0.045) : 0),
+                    radius: shadow && radius > 0 ? 14 : 0,
+                    y: shadow && radius > 0 ? 4 : 0)
     }
 }
 
