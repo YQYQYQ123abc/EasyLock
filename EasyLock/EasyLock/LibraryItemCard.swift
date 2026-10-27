@@ -113,8 +113,8 @@ struct LibraryListRow: View {
             .overlay(alignment: .leading) {
                 if selected {
                     Capsule()
-                        .fill(EasyLockStyle.ink)
-                        .frame(width: 2.5, height: 20)
+                        .fill(EasyLockStyle.blue)
+                        .frame(width: 3, height: 20)
                         .padding(.leading, 1)
                 }
             }
@@ -131,7 +131,7 @@ struct LibraryListRow: View {
     }
 
     private var selectionFill: Color {
-        selected ? EasyLockStyle.ink.opacity(0.055) : (hovering ? EasyLockStyle.ink.opacity(0.028) : .clear)
+        selected ? EasyLockStyle.blueSoft : (hovering ? EasyLockStyle.blue.opacity(0.045) : .clear)
     }
 }
 
@@ -143,22 +143,26 @@ struct FileBadge: View {
 
     private var style: FileVisualStyle { .resolve(name: name, folder: folder, locked: locked) }
 
+    private var usesAccent: Bool { locked || folder }
+
     var body: some View {
         let shape = RoundedRectangle(cornerRadius: size * 0.27, style: .continuous)
         ZStack(alignment: .bottomTrailing) {
             shape
-                .fill(EasyLockStyle.surfaceMuted)
-                .overlay { shape.strokeBorder(EasyLockStyle.border, lineWidth: 1) }
+                .fill(usesAccent ? EasyLockStyle.blueSoft : EasyLockStyle.surfaceMuted)
+                .overlay {
+                    shape.strokeBorder(usesAccent ? EasyLockStyle.blue.opacity(0.16) : EasyLockStyle.border, lineWidth: 1)
+                }
             Image(systemName: style.symbol)
-                .font(.system(size: size * 0.42, weight: .regular))
-                .foregroundStyle(EasyLockStyle.ink.opacity(0.82))
+                .font(.system(size: size * 0.42, weight: .medium))
+                .foregroundStyle(usesAccent ? EasyLockStyle.blueDeep : EasyLockStyle.ink.opacity(0.76))
                 .frame(width: size, height: size)
             if locked && size >= 48 {
                 Image(systemName: "lock.fill")
                     .font(.system(size: 7.5, weight: .bold))
-                    .foregroundStyle(EasyLockStyle.buttonText)
+                    .foregroundStyle(.white)
                     .frame(width: 16, height: 16)
-                    .background(EasyLockStyle.ink, in: Circle())
+                    .background(EasyLockStyle.blue, in: Circle())
                     .overlay { Circle().strokeBorder(EasyLockStyle.surface, lineWidth: 1.5) }
                     .offset(x: 3, y: 3)
             }
@@ -174,11 +178,11 @@ struct SelectionDot: View {
     var body: some View {
         ZStack {
             Circle()
-                .strokeBorder(selected ? EasyLockStyle.ink : EasyLockStyle.borderStrong, lineWidth: 1.2)
+                .strokeBorder(selected ? EasyLockStyle.blue : EasyLockStyle.borderStrong, lineWidth: 1.2)
                 .frame(width: 17, height: 17)
             if selected {
                 Circle()
-                    .fill(EasyLockStyle.ink)
+                    .fill(EasyLockStyle.blue)
                     .frame(width: 17, height: 17)
                 Image(systemName: "checkmark")
                     .font(.system(size: 8, weight: .bold))

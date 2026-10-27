@@ -3,13 +3,14 @@ import AppKit
 import UniformTypeIdentifiers
 
 private enum Section: String, CaseIterable, Identifiable {
-    case files = "加密文件", computer = "本机文件", security = "安全与解锁", general = "常规", recovery = "恢复与检查", theme = "主题", about = "关于"
+    case overview = "概览", files = "加密文件", computer = "本机文件", security = "安全与解锁", general = "常规", recovery = "恢复与检查", theme = "主题", about = "关于"
     #if EASYLOCK_ENABLE_LICENSING
     case membership = "许可证"
     #endif
     var id: String { rawValue }
     var icon: String {
         switch self {
+        case .overview: "rectangle.grid.2x2"
         case .files: "lock.doc"
         case .computer: "internaldrive"
         case .security: "lock.shield"
@@ -28,13 +29,13 @@ struct ContentView: View {
     @Bindable var store: VaultStore
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
     @AppStorage("appearanceMode") private var appearanceMode = "system"
-    @AppStorage("libraryGrid") private var libraryGrid = false
+    @AppStorage("libraryGrid") private var libraryGrid = true
     @State private var showFileDetails = false
     @AppStorage("widgetShowCount") private var widgetShowCount = false
     @State private var showPasswordApp = false
     @State private var showHelp = false
     @State private var requests = ExternalFileRequests.shared
-    @State private var section: Section = .files
+    @State private var section: Section = .overview
     @FocusState private var welcomeFocused: Bool
     @State private var search = ""
     @State private var attentionOnly = false
@@ -73,7 +74,6 @@ struct ContentView: View {
                     workspaceDetail
                 }
                 .navigationSplitViewStyle(.balanced)
-                .toolbar(removing: .sidebarToggle)
             }
         }
         .background { WorkspaceBackground() }
@@ -114,7 +114,7 @@ struct ContentView: View {
         .preferredColorScheme(appearanceMode == "dark" ? .dark : appearanceMode == "light" ? .light : nil)
         .tint(accent)
         .groupBoxStyle(BrandGroupBoxStyle())
-        .frame(minWidth: 980, minHeight: 660)
+        .frame(minWidth: 1040, minHeight: 700)
         .toolbar {
             ToolbarItemGroup(placement: .primaryAction) {
                 Button { showHelp = true } label: { Label("使用帮助", systemImage: "questionmark.circle") }
@@ -130,12 +130,11 @@ struct ContentView: View {
                 .frame(width: 1, height: 1)
                 .allowsHitTesting(false)
         }
-
         .safeAreaInset(edge: .bottom, spacing: 0) {
             if store.busy {
                 VStack(alignment: .leading, spacing: 8) {
                     HStack(spacing: 10) {
-                        ProgressView().controlSize(.small).tint(EasyLockStyle.ink)
+                        ProgressView().controlSize(.small).tint(EasyLockStyle.blue)
                         Text(store.password.isEmpty && !store.guestDecrypt ? "正在安全结束当前操作…" : store.progress)
                             .font(.system(size: 11.5, weight: .medium))
                             .lineLimit(1)
@@ -159,7 +158,7 @@ struct ContentView: View {
                         .foregroundStyle(.secondary)
                         if update.total > 0 {
                             ProgressView(value: min(Double(update.completed) / Double(update.total), 1))
-                                .tint(EasyLockStyle.ink)
+                                .tint(EasyLockStyle.blue)
                         }
                     }
                     if store.batchTotal > 0 {
@@ -236,18 +235,12 @@ struct ContentView: View {
 
     private var sidebar: some View {
         VStack(alignment: .leading, spacing: 0) {
-            HStack(spacing: 11) {
-                ShieldMark(size: 28, tone: .light)
-                    .frame(width: 38, height: 38)
-                    .background(Color.white.opacity(0.055), in: RoundedRectangle(cornerRadius: 11, style: .continuous))
-                    .overlay {
-                        RoundedRectangle(cornerRadius: 11, style: .continuous)
-                            .strokeBorder(Color.white.opacity(0.10), lineWidth: 1)
-                    }
+            HStack(spacing: 12) {
+                BrandMark(size: 38)
                 VStack(alignment: .leading, spacing: 2) {
                     Text("EasyLock")
                         .font(.system(size: 15, weight: .semibold))
-                        .foregroundStyle(.white)
+                        .foregroundStyle(EasyLockStyle.ink)
                     Text("本机文件保险箱")
                         .font(.system(size: 10))
                         .foregroundStyle(EasyLockStyle.sidebarDim)
@@ -260,7 +253,7 @@ struct ContentView: View {
 
             ScrollView {
                 VStack(alignment: .leading, spacing: 20) {
-                    sidebarGroup("保险箱", items: [.files, .computer])
+                    sidebarGroup("保险箱", items: [.overview, .files, .computer])
                     sidebarGroup("安全", items: [.security, .recovery])
                     sidebarGroup("应用", items: [.general, .theme, .about])
                     #if EASYLOCK_ENABLE_LICENSING
@@ -308,10 +301,10 @@ struct ContentView: View {
                     Text("\(store.items.count)")
                         .font(.system(size: 9.5, weight: .semibold))
                         .monospacedDigit()
-                        .foregroundStyle(selected ? EasyLockStyle.sidebarSelectedText.opacity(0.55) : EasyLockStyle.sidebarDim)
+                        .foregroundStyle(selected ? EasyLockStyle.blueDeep : EasyLockStyle.tertiary)
                         .padding(.horizontal, 6)
                         .padding(.vertical, 2)
-                        .background(selected ? Color.black.opacity(0.07) : Color.white.opacity(0.07), in: Capsule())
+                        .background(selected ? EasyLockStyle.blue.opacity(0.12) : EasyLockStyle.surfaceMuted, in: Capsule())
                 }
                 if item == .recovery && (!store.recoveries.isEmpty || !store.recoveryErrors.isEmpty) {
                     Circle()
@@ -324,8 +317,8 @@ struct ContentView: View {
             .padding(.vertical, 7.5)
             .background {
                 if selected {
-                    RoundedRectangle(cornerRadius: 8.5, style: .continuous)
-                        .fill(Color.white)
+                    RoundedRectangle(cornerRadius: 9, style: .continuous)
+                        .fill(EasyLockStyle.sidebarSelectedFill)
                 }
             }
             .contentShape(Rectangle())
@@ -337,19 +330,23 @@ struct ContentView: View {
     private var sidebarFooter: some View {
         VStack(alignment: .leading, spacing: 11) {
             HStack(spacing: 7) {
-                Circle().fill(Color.white).frame(width: 5, height: 5)
+                Circle().fill(EasyLockStyle.success).frame(width: 6, height: 6)
                 Text("会话已解锁")
                     .font(.system(size: 10.5, weight: .medium))
-                    .foregroundStyle(.white.opacity(0.82))
+                    .foregroundStyle(EasyLockStyle.ink)
                 Spacer(minLength: 4)
                 Button {
                     store.lockSession(); input = ""; confirmation = ""
                 } label: {
                     Image(systemName: "lock")
                         .font(.system(size: 10, weight: .semibold))
-                        .foregroundStyle(.white.opacity(0.66))
-                        .frame(width: 22, height: 22)
-                        .background(Color.white.opacity(0.07), in: RoundedRectangle(cornerRadius: 6, style: .continuous))
+                        .foregroundStyle(EasyLockStyle.sidebarText)
+                        .frame(width: 24, height: 24)
+                        .background(EasyLockStyle.surface, in: RoundedRectangle(cornerRadius: 7, style: .continuous))
+                        .overlay {
+                            RoundedRectangle(cornerRadius: 7, style: .continuous)
+                                .strokeBorder(EasyLockStyle.sidebarLine, lineWidth: 1)
+                        }
                 }
                 .buttonStyle(.plain)
                 .disabled(store.busy)
@@ -368,7 +365,7 @@ struct ContentView: View {
             Text("EASYLOCK · LOCAL VAULT")
                 .font(.system(size: 8, weight: .semibold))
                 .tracking(1.6)
-                .foregroundStyle(Color.white.opacity(0.18))
+                .foregroundStyle(EasyLockStyle.sidebarDim.opacity(0.65))
         }
         .padding(.horizontal, 16)
         .padding(.top, 14)
@@ -384,6 +381,7 @@ struct ContentView: View {
                 if store.password.isEmpty { welcome }
                 else {
                     switch section {
+                    case .overview: overview
                     case .files: library
                     case .computer: LocalFilesView(store: store)
                     case .security, .general, .recovery, .theme, .about: settings
@@ -396,9 +394,9 @@ struct ContentView: View {
                 .overlay {
                     if dropTargeted && !store.busy {
                         RoundedRectangle(cornerRadius: 18, style: .continuous)
-                            .strokeBorder(EasyLockStyle.ink, style: StrokeStyle(lineWidth: 1.6, dash: [8, 5]))
+                            .strokeBorder(EasyLockStyle.blue, style: StrokeStyle(lineWidth: 1.6, dash: [8, 5]))
                             .padding(10)
-                            .background(EasyLockStyle.ink.opacity(0.025))
+                            .background(EasyLockStyle.blue.opacity(0.035))
                             .allowsHitTesting(false)
                     }
                 }
@@ -590,7 +588,7 @@ struct ContentView: View {
                             .font(.system(size: 11, weight: .bold))
                             .foregroundStyle(input.isEmpty ? EasyLockStyle.ink.opacity(0.55) : EasyLockStyle.buttonText)
                             .frame(width: 31, height: 31)
-                            .background(input.isEmpty ? EasyLockStyle.surfaceMuted : EasyLockStyle.ink, in: Circle())
+                            .background(input.isEmpty ? EasyLockStyle.surfaceMuted : EasyLockStyle.buttonFill, in: Circle())
                             .overlay {
                                 Circle().strokeBorder(input.isEmpty ? EasyLockStyle.border : .clear, lineWidth: 1)
                             }
@@ -706,6 +704,17 @@ struct ContentView: View {
         Circle().fill(EasyLockStyle.borderStrong).frame(width: 2.5, height: 2.5)
     }
 
+    private var overview: some View {
+        OverviewView(store: store,
+                     openLibrary: { section = .files },
+                     openLocalFiles: { section = .computer },
+                     openSecurity: { section = .security },
+                     openItem: { item in
+                         store.selection = [item.id]
+                         section = .files
+                     })
+    }
+
     private var library: some View {
         VStack(spacing: 0) {
             HStack(alignment: .center, spacing: 16) {
@@ -725,12 +734,85 @@ struct ContentView: View {
             .padding(.horizontal, 26)
             .padding(.vertical, 16)
 
+            librarySummary
+                .padding(.horizontal, 24)
+                .padding(.bottom, 14)
+
             Rectangle().fill(EasyLockStyle.border).frame(height: 1)
 
             if libraryGrid { gridLibrary } else { listLibrary }
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
         .background { WorkspaceBackground() }
+    }
+
+    private var librarySummary: some View {
+        HStack(spacing: 12) {
+            librarySummaryCard(title: "记录",
+                               value: "\(store.items.count)",
+                               unit: "项",
+                               symbol: "lock.doc",
+                               tint: EasyLockStyle.blue,
+                               soft: EasyLockStyle.blueSoft)
+            librarySummaryCard(title: "密文大小",
+                               value: libraryTotalSize,
+                               unit: nil,
+                               symbol: "internaldrive",
+                               tint: EasyLockStyle.blue,
+                               soft: EasyLockStyle.blueSoft)
+            librarySummaryCard(title: "需检查",
+                               value: "\(libraryAttentionCount)",
+                               unit: "项",
+                               symbol: "exclamationmark.triangle.fill",
+                               tint: libraryAttentionCount == 0 ? EasyLockStyle.success : EasyLockStyle.warning,
+                               soft: libraryAttentionCount == 0 ? EasyLockStyle.successSoft : EasyLockStyle.warningSoft)
+        }
+    }
+
+    private func librarySummaryCard(title: String,
+                                    value: String,
+                                    unit: String?,
+                                    symbol: String,
+                                    tint: Color,
+                                    soft: Color) -> some View {
+        HStack(spacing: 12) {
+            Image(systemName: symbol)
+                .font(.system(size: 13, weight: .semibold))
+                .foregroundStyle(tint)
+                .frame(width: 34, height: 34)
+                .background(soft, in: RoundedRectangle(cornerRadius: 9, style: .continuous))
+            VStack(alignment: .leading, spacing: 2) {
+                Text(title)
+                    .font(.system(size: 9.5, weight: .medium))
+                    .foregroundStyle(.secondary)
+                HStack(alignment: .firstTextBaseline, spacing: 3) {
+                    Text(value)
+                        .font(.system(size: 17, weight: .semibold))
+                        .tracking(-0.25)
+                        .monospacedDigit()
+                        .lineLimit(1)
+                        .minimumScaleFactor(0.75)
+                    if let unit {
+                        Text(unit)
+                            .font(.system(size: 9.5, weight: .medium))
+                            .foregroundStyle(.secondary)
+                    }
+                }
+            }
+            Spacer(minLength: 0)
+        }
+        .padding(.horizontal, 14)
+        .padding(.vertical, 11)
+        .frame(maxWidth: .infinity)
+        .background { GlassPanel(radius: 16) }
+    }
+
+    private var libraryAttentionCount: Int {
+        store.items.filter { $0.warning != nil || $0.originalRetained }.count
+    }
+
+    private var libraryTotalSize: String {
+        ByteCountFormatter.string(fromByteCount: Int64(store.items.reduce(0) { $0 + $1.size }), countStyle: .file)
     }
 
     private var librarySearchField: some View {
@@ -754,23 +836,38 @@ struct ContentView: View {
         .frame(maxWidth: 310)
     }
 
-    private var libraryAddMenu: some View {
+    private var libraryAddButton: some View {
+        Button { store.chooseSources() } label: {
+            Label("添加文件", systemImage: "plus")
+                .font(.system(size: 12, weight: .semibold))
+        }
+        .buttonStyle(BrandPrimaryButtonStyle())
+        .disabled(!store.canPresentPicker || store.busy)
+    }
+
+    private var libraryMoreMenu: some View {
         Menu {
-            Button("添加文件…") { store.chooseSources() }
             Button("添加文件夹…") { store.chooseSources(foldersOnly: true) }
             Button("导入已有密文…") { store.importFiles() }
-            if !store.outcomes.isEmpty { Button("上次任务结果") { store.showResults = true } }
+            if !store.outcomes.isEmpty {
+                Divider()
+                Button("上次任务结果") { store.showResults = true }
+            }
         } label: {
-            Label("添加", systemImage: "plus")
+            Image(systemName: "ellipsis")
                 .font(.system(size: 12, weight: .semibold))
-                .padding(.horizontal, 13)
-                .padding(.vertical, 8)
-                .foregroundStyle(EasyLockStyle.buttonText)
-                .background(EasyLockStyle.ink, in: RoundedRectangle(cornerRadius: 9, style: .continuous))
+                .foregroundStyle(EasyLockStyle.secondary)
+                .frame(width: 32, height: 32)
+                .background(EasyLockStyle.surface, in: RoundedRectangle(cornerRadius: 9, style: .continuous))
+                .overlay {
+                    RoundedRectangle(cornerRadius: 9, style: .continuous)
+                        .strokeBorder(EasyLockStyle.border, lineWidth: 1)
+                }
         }
         .menuStyle(.borderlessButton)
         .menuIndicator(.hidden)
         .fixedSize()
+        .disabled(!store.canPresentPicker || store.busy)
     }
 
     private var libraryAttentionBanner: some View {
@@ -788,7 +885,7 @@ struct ContentView: View {
         .foregroundStyle(EasyLockStyle.warning)
         .padding(.horizontal, 12)
         .padding(.vertical, 8)
-        .background(EasyLockStyle.warning.opacity(0.055), in: RoundedRectangle(cornerRadius: 10, style: .continuous))
+        .background(EasyLockStyle.warningSoft, in: RoundedRectangle(cornerRadius: 10, style: .continuous))
         .overlay {
             RoundedRectangle(cornerRadius: 10, style: .continuous)
                 .strokeBorder(EasyLockStyle.warning.opacity(0.20), lineWidth: 1)
@@ -807,7 +904,8 @@ struct ContentView: View {
                 .pickerStyle(.segmented)
                 .labelsHidden()
                 .frame(width: 150)
-                libraryAddMenu
+                libraryMoreMenu
+                libraryAddButton
             }
             .padding(.horizontal, 24)
             .padding(.top, 14)
@@ -901,7 +999,8 @@ struct ContentView: View {
                         .font(.system(size: 11))
                 }
                 Spacer(minLength: 8)
-                libraryAddMenu
+                libraryMoreMenu
+                libraryAddButton
             }
             .padding(.horizontal, 24)
             .padding(.top, 14)
@@ -1128,7 +1227,7 @@ struct ContentView: View {
                         .font(.system(size: 9, weight: .bold))
                         .foregroundStyle(EasyLockStyle.buttonText)
                         .frame(width: 20, height: 20)
-                        .background(EasyLockStyle.ink, in: Circle())
+                        .background(EasyLockStyle.blue, in: Circle())
                         .overlay { Circle().strokeBorder(EasyLockStyle.surface, lineWidth: 2) }
                         .offset(x: 2, y: 2)
                 }
@@ -1177,7 +1276,7 @@ struct ContentView: View {
                 RoundedRectangle(cornerRadius: 22, style: .continuous)
                     .fill(EasyLockStyle.surface)
                 RoundedRectangle(cornerRadius: 22, style: .continuous)
-                    .strokeBorder(dropTargeted ? EasyLockStyle.ink : EasyLockStyle.border,
+                    .strokeBorder(dropTargeted ? EasyLockStyle.blue : EasyLockStyle.border,
                                   style: StrokeStyle(lineWidth: dropTargeted ? 1.5 : 1,
                                                      dash: dropTargeted ? [7, 5] : [6, 5]))
                 RoundedRectangle(cornerRadius: 17, style: .continuous)
@@ -1553,7 +1652,7 @@ struct ContentView: View {
                         Spacer(minLength: 8)
                         Text(item.canRestore ? "可恢复" : "需检查")
                             .font(.system(size: 9, weight: .semibold))
-                            .foregroundStyle(item.canRestore ? EasyLockStyle.ink : EasyLockStyle.warning)
+                            .foregroundStyle(item.canRestore ? EasyLockStyle.success : EasyLockStyle.warning)
                             .padding(.horizontal, 7)
                             .padding(.vertical, 3)
                             .background(EasyLockStyle.surfaceMuted, in: Capsule())
@@ -1599,7 +1698,7 @@ struct ContentView: View {
                         HStack(alignment: .top, spacing: 10) {
                             Image(systemName: item.status == "成功" ? "checkmark.circle.fill" : "exclamationmark.triangle.fill")
                                 .font(.system(size: 11, weight: .semibold))
-                                .foregroundStyle(item.status == "成功" ? EasyLockStyle.ink : EasyLockStyle.warning)
+                                .foregroundStyle(item.status == "成功" ? EasyLockStyle.success : EasyLockStyle.warning)
                                 .padding(.top, 1)
                             VStack(alignment: .leading, spacing: 3) {
                                 Text(item.name)
@@ -1613,7 +1712,7 @@ struct ContentView: View {
                             Spacer(minLength: 12)
                             Text(item.status)
                                 .font(.system(size: 10, weight: .semibold))
-                                .foregroundStyle(item.status == "成功" ? EasyLockStyle.ink : EasyLockStyle.warning)
+                                .foregroundStyle(item.status == "成功" ? EasyLockStyle.success : EasyLockStyle.warning)
                         }
                         .padding(.vertical, 11)
                         .overlay(alignment: .bottom) {
@@ -1688,7 +1787,7 @@ struct ContentView: View {
                 .frame(maxHeight: 100)
 
                 if store.inspectingSources {
-                    ProgressView().controlSize(.small).tint(EasyLockStyle.ink)
+                    ProgressView().controlSize(.small).tint(EasyLockStyle.blue)
                 }
             }
 
@@ -1953,13 +2052,8 @@ struct ContentView: View {
     }
 }
 
-
-
-
-/// macOS 26 still injects the NavigationSplitView sidebar toggle even when
-/// `toolbar(removing: .sidebarToggle)` is applied. In light appearance its glass
-/// capsule hides the white glyph over our dark sidebar, so remove just that
-/// system item once the window and toolbar exist.
+/// Hides the system sidebar toggle so the light sidebar header stays clean.
+/// Navigation remains available from the sidebar itself.
 private struct SidebarToggleHider: NSViewRepresentable {
     func makeNSView(context: Context) -> NSView { HiderView() }
     func updateNSView(_ view: NSView, context: Context) { (view as? HiderView)?.hideToggle() }

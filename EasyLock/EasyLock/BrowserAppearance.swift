@@ -40,12 +40,27 @@ struct BrowserFileArtwork: View {
 
     private var style: FileVisualStyle { .resolve(name: name, folder: folder, locked: locked) }
 
+    private var usesAccent: Bool { locked || folder }
+
     private var tile: LinearGradient {
-        scheme == .dark
-            ? LinearGradient(colors: [Color(red: 0.165, green: 0.165, blue: 0.175),
-                                      Color(red: 0.105, green: 0.105, blue: 0.113)],
+        if unavailable {
+            return scheme == .dark
+                ? LinearGradient(colors: [Color(red: 0.23, green: 0.16, blue: 0.08), Color(red: 0.16, green: 0.11, blue: 0.06)],
+                                 startPoint: .topLeading, endPoint: .bottomTrailing)
+                : LinearGradient(colors: [Color(red: 1.0, green: 0.97, blue: 0.90), Color(red: 0.99, green: 0.93, blue: 0.82)],
+                                 startPoint: .topLeading, endPoint: .bottomTrailing)
+        }
+        if usesAccent {
+            return scheme == .dark
+                ? LinearGradient(colors: [Color(red: 0.12, green: 0.19, blue: 0.32), Color(red: 0.09, green: 0.14, blue: 0.24)],
+                                 startPoint: .topLeading, endPoint: .bottomTrailing)
+                : LinearGradient(colors: [Color(red: 0.95, green: 0.97, blue: 1.0), Color(red: 0.86, green: 0.92, blue: 1.0)],
+                                 startPoint: .topLeading, endPoint: .bottomTrailing)
+        }
+        return scheme == .dark
+            ? LinearGradient(colors: [Color(red: 0.16, green: 0.17, blue: 0.19), Color(red: 0.11, green: 0.12, blue: 0.13)],
                              startPoint: .topLeading, endPoint: .bottomTrailing)
-            : LinearGradient(colors: [Color.white, Color(red: 0.925, green: 0.925, blue: 0.905)],
+            : LinearGradient(colors: [Color.white, Color(red: 0.94, green: 0.95, blue: 0.96)],
                              startPoint: .topLeading, endPoint: .bottomTrailing)
     }
 
@@ -55,7 +70,9 @@ struct BrowserFileArtwork: View {
             shape
                 .fill(tile)
                 .overlay {
-                    shape.strokeBorder(scheme == .dark ? Color.white.opacity(0.07) : Color.black.opacity(0.09), lineWidth: 1)
+                    shape.strokeBorder(unavailable ? EasyLockStyle.warning.opacity(0.25)
+                                        : usesAccent ? EasyLockStyle.blue.opacity(0.16)
+                                        : EasyLockStyle.border, lineWidth: 1)
                 }
                 .overlay {
                     shape.inset(by: 1)
@@ -65,8 +82,10 @@ struct BrowserFileArtwork: View {
                 .frame(width: tileSize, height: tileSize)
 
             Image(systemName: style.symbol)
-                .font(.system(size: tileSize * 0.38, weight: .light))
-                .foregroundStyle(EasyLockStyle.ink.opacity(locked ? 0.9 : 0.66))
+                .font(.system(size: tileSize * 0.38, weight: .medium))
+                .foregroundStyle(unavailable ? EasyLockStyle.warning
+                                  : usesAccent ? EasyLockStyle.blueDeep
+                                  : EasyLockStyle.ink.opacity(0.62))
                 .frame(width: tileSize, height: tileSize)
                 .symbolRenderingMode(.monochrome)
 
@@ -86,11 +105,11 @@ struct BrowserFileArtwork: View {
                 .fill(EasyLockStyle.surface)
                 .frame(width: 26, height: 26)
             Circle()
-                .fill(unavailable ? EasyLockStyle.warning : EasyLockStyle.ink)
+                .fill(unavailable ? EasyLockStyle.warning : EasyLockStyle.blue)
                 .frame(width: 21, height: 21)
             Image(systemName: unavailable ? "exclamationmark" : "lock.fill")
                 .font(.system(size: 8.5, weight: .bold))
-                .foregroundStyle(unavailable ? Color.white : EasyLockStyle.buttonText)
+                .foregroundStyle(.white)
         }
         .shadow(color: .black.opacity(0.20), radius: 3, y: 1)
     }
@@ -100,7 +119,12 @@ struct FileStatusPill: View {
     let locked: Bool
     var needsAttention = false
 
-    private var color: Color { needsAttention ? EasyLockStyle.warning : EasyLockStyle.ink }
+    private var color: Color {
+        needsAttention ? EasyLockStyle.warning : locked ? EasyLockStyle.blueDeep : EasyLockStyle.secondary
+    }
+    private var fill: Color {
+        needsAttention ? EasyLockStyle.warningSoft : locked ? EasyLockStyle.blueSoft : EasyLockStyle.surfaceMuted
+    }
     private var label: String { needsAttention ? "需检查" : locked ? "已上锁" : "未加密" }
     private var symbol: String {
         needsAttention ? "exclamationmark.triangle.fill" : locked ? "lock.fill" : "lock.open"
@@ -111,12 +135,12 @@ struct FileStatusPill: View {
             Image(systemName: symbol).font(.system(size: 8, weight: .bold))
             Text(label).font(.system(size: 9.5, weight: .semibold)).tracking(0.2)
         }
-        .foregroundStyle(needsAttention ? color : (locked ? color : EasyLockStyle.secondary))
+        .foregroundStyle(color)
         .padding(.horizontal, 8)
         .padding(.vertical, 4)
-        .background(color.opacity(locked || needsAttention ? 0.07 : 0.04), in: Capsule())
+        .background(fill, in: Capsule())
         .overlay {
-            Capsule().strokeBorder(color.opacity(locked || needsAttention ? 0.22 : 0.16), lineWidth: 1)
+            Capsule().strokeBorder(color.opacity(0.22), lineWidth: 1)
         }
         .accessibilityLabel(label)
     }
@@ -144,15 +168,15 @@ struct BrowserCardSurface: ViewModifier {
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
 
     func body(content: Content) -> some View {
-        let shape = RoundedRectangle(cornerRadius: 16, style: .continuous)
+        let shape = RoundedRectangle(cornerRadius: 18, style: .continuous)
         content
-            .padding(14)
-            .background { GlassPanel(radius: 16) }
+            .padding(16)
+            .background { GlassPanel(radius: 18) }
             .overlay {
-                shape.strokeBorder(selected ? EasyLockStyle.ink : .clear, lineWidth: 1.6)
+                shape.strokeBorder(selected ? EasyLockStyle.blue : .clear, lineWidth: 1.6)
             }
             .overlay {
-                shape.strokeBorder(hovering && !selected ? EasyLockStyle.ink.opacity(0.16) : .clear, lineWidth: 1)
+                shape.strokeBorder(hovering && !selected ? EasyLockStyle.blue.opacity(0.22) : .clear, lineWidth: 1)
             }
             .onHover { hovering = $0 }
             .animation(reduceMotion ? nil : .easeOut(duration: 0.15), value: hovering)
@@ -175,7 +199,7 @@ struct BrowserEmptyState: View {
                         .font(.system(size: 11, weight: .semibold))
                         .foregroundStyle(EasyLockStyle.buttonText)
                         .frame(width: 27, height: 27)
-                        .background(EasyLockStyle.ink, in: Circle())
+                        .background(EasyLockStyle.blue, in: Circle())
                         .overlay { Circle().strokeBorder(EasyLockStyle.surface, lineWidth: 2) }
                         .offset(x: 3, y: 3)
                 }

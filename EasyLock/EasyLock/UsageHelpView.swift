@@ -90,11 +90,11 @@ struct UsageHelpView: View {
                         .font(.system(size: 9.5, weight: .bold))
                         .foregroundStyle(EasyLockStyle.buttonText)
                         .frame(width: 22, height: 22)
-                        .background(EasyLockStyle.ink, in: Circle())
+                        .background(EasyLockStyle.blue, in: Circle())
                 } else {
                     Image(systemName: symbol)
                         .font(.system(size: 9.5, weight: .medium))
-                        .foregroundStyle(EasyLockStyle.ink.opacity(0.75))
+                        .foregroundStyle(EasyLockStyle.blueDeep.opacity(0.85))
                         .frame(width: 22, height: 22)
                         .background(EasyLockStyle.surfaceMuted, in: RoundedRectangle(cornerRadius: 6, style: .continuous))
                         .overlay {
