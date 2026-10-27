@@ -1,6 +1,6 @@
 # EasyLock 免费离线版发布准备
 
-截至 2026-10-22，当前为 0.8.2 Preview 3（构建 32）开发预览版，尚不是已完成公证或商店审核的发行版本。官网独立版与 Mac App Store 版共用文件格式，均免费、无需账号或激活，不限制设备数量。
+截至 2026-10-27，当前为 0.9.0 Preview 1（构建 33）开发预览版，尚不是已完成公证或商店审核的发行版本。官网独立版与 Mac App Store 版共用文件格式，均免费、无需账号或激活，不限制设备数量。
 
 ## 当前发行策略
 
@@ -45,6 +45,13 @@ python3 Tests/check-offline-build.py /tmp/EasyLock-offline-store/Build/Products/
 - `Tests/run-tests.sh` 全部通过，`Tests/check-offline-build.py` 通过。完整真实界面操作、Intel 与最低系统实机兼容性、下载后 Gatekeeper 验收仍待完成。
 - 下载资产：`EasyLock-0.8.2-preview.3-macOS-universal-dev.zip`，SHA-256 `99a57647a2a6c3231838ef906e5ee34dc53b54416f48bd63d7adc7aee5c9faa0`。
 - 本次主要是界面、Quick Look、Finder 缩略图和小组件改版；未改动加密算法、文件格式或文件替换流程。详情见 [Preview 3 发布说明](ReleaseNotes/0.8.2-preview.3.md)。
+
+## 构建 33 的发布状态（2026-10-27）
+
+- 0.9.0 Preview 1 按独立分发配置构建为 arm64 + x86_64 双架构 Release 包，主应用及三个扩展通过签名完整性检查。
+- 下载包实际使用 Apple Development 签名，未公证；`spctl` 会按预期拒绝。
+- 本次为界面、图标、Finder / Quick Look / 缩略图 / 小组件与构建流程更新；未改动加密算法、文件格式或文件替换流程。
+- 下载资产与 SHA-256 以 GitHub Release 页面为准。完整真实界面操作、Intel 与最低系统实机兼容性、下载后 Gatekeeper 验收仍待完成。
 
 ## 上线前必须完成（按优先级）
 

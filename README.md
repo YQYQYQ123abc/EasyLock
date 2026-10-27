@@ -5,11 +5,11 @@
 
 > **开发预览版**：尚未完成正式公证、独立安全审查和完整实机验收。请仅使用有独立备份的测试文件。Release 中的测试包采用开发签名，其他 Mac 可能无法直接运行。
 
-[查看测试版本](https://github.com/YQYQYQ123abc/EasyLock/releases/tag/v0.8.2-preview.3) · [使用支持](https://yqyqyq123abc.github.io/EasyLock/support.html) · [隐私说明](https://yqyqyq123abc.github.io/EasyLock/privacy.html) · [反馈问题](https://github.com/YQYQYQ123abc/EasyLock/issues)
+[查看测试版本](https://github.com/YQYQYQ123abc/EasyLock/releases/tag/v0.9.0-preview.1) · [使用支持](https://yqyqyq123abc.github.io/EasyLock/support.html) · [隐私说明](https://yqyqyq123abc.github.io/EasyLock/privacy.html) · [反馈问题](https://github.com/YQYQYQ123abc/EasyLock/issues)
 
-## 0.8.2 Preview 3 · 构建 32
+## 0.9.0 Preview 1 · 构建 33
 
-全新黑白界面，围绕盾牌图标重做侧栏、欢迎页、加密文件、本机文件、设置、弹窗、Quick Look、Finder 缩略图与桌面小组件；修复文件夹预览分栏未撑满的问题。本版未改变密文格式。完整变更、测试范围和升级步骤见 [发布说明](EasyLock/Distribution/ReleaseNotes/0.8.2-preview.3.md)。
+全新浅色、信号蓝界面，围绕新的 EasyLock2 图标重做概览看板、侧栏、加密文件、本机文件、设置、弹窗、Quick Look、Finder 缩略图与桌面小组件；概览改为自适应三列布局，并修复页面切换残影和卡片视觉粘连。本版未改变密文格式。完整变更、测试范围和升级步骤见 [发布说明](EasyLock/Distribution/ReleaseNotes/0.9.0-preview.1.md)。
 
 ## 可以做什么
 
